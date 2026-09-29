@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aplikasi Laporan Kerja Harian Pro - Cloud Sync</title>
+    <title>Aplikasi Laporan Kerja Harian Pro</title>
     <!-- Tailwind CSS v4 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,8 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- html2pdf.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- Google Identity Services SDK -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -90,7 +88,7 @@
             </div>
             <div class="space-y-1.5">
                 <h1 class="text-sm font-bold tracking-tight text-white uppercase">Laporan Kerja Harian Pro</h1>
-                <p id="splash-status" class="text-[11px] text-slate-400 font-medium">Memuat database & sinkronisasi awan...</p>
+                <p id="splash-status" class="text-[11px] text-slate-400 font-medium">Memuat database lokal...</p>
             </div>
             <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden p-0.5 border border-slate-800 shadow-inner">
                 <div id="splash-progress" class="bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 h-full rounded-full transition-all duration-300 w-0"></div>
@@ -112,7 +110,7 @@
                     </div>
                     <div>
                         <h1 id="brand-title" class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white whitespace-nowrap">Laporan Kerja Harian</h1>
-                        <p class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold tracking-tight whitespace-nowrap">Cloud Sync & Persistent Storage</p>
+                        <p class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold tracking-tight whitespace-nowrap">Persistent Storage System</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-2 shrink-0">
@@ -153,9 +151,9 @@
                     <div class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition"><i class="fa-solid fa-circle-plus text-xs"></i></div>
                     <span>Buat Laporan Baru</span>
                 </button>
-                <button onclick="switchTab('cloud'); toggleSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition group cursor-pointer">
-                    <div class="w-7 h-7 rounded-lg bg-violet-100 dark:bg-violet-950 text-violet-600 dark:text-violet-400 flex items-center justify-center transition"><i class="fa-solid fa-cloud-arrow-up text-xs"></i></div>
-                    <span>Google Drive & Cloud Sync</span>
+                <button onclick="switchTab('backup'); toggleSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition group cursor-pointer">
+                    <div class="w-7 h-7 rounded-lg bg-violet-100 dark:bg-violet-950 text-violet-600 dark:text-violet-400 flex items-center justify-center transition"><i class="fa-solid fa-mobile-screen-button text-xs"></i></div>
+                    <span>Backup & Pemulihan Data</span>
                 </button>
                 <button onclick="switchTab('settings'); toggleSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-900 dark:text-slate-100 transition group cursor-pointer border border-slate-200 dark:border-slate-700 shadow-2xs">
                     <div class="w-7 h-7 rounded-lg bg-amber-200 dark:bg-amber-950 text-amber-700 dark:text-amber-400 flex items-center justify-center transition"><i class="fa-solid fa-gears text-xs"></i></div>
@@ -172,7 +170,7 @@
             
             <!-- TAB: HOME / DASHBOARD -->
             <section id="tab-home" class="tab-content space-y-6">
-                <!-- Status Banner Sinkronisasi Otomatis -->
+                <!-- Status Banner Perlindungan Data -->
                 <div class="bg-gradient-to-r from-indigo-900 to-violet-900 text-white p-4 rounded-3xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-lg">
@@ -183,8 +181,8 @@
                             <p class="text-[11px] text-indigo-200">Data tersimpan di Database Lokal Ponsel & aman dari pembersihan cache.</p>
                         </div>
                     </div>
-                    <button onclick="switchTab('cloud')" class="bg-white text-indigo-900 hover:bg-indigo-50 font-bold px-4 py-2 rounded-2xl text-xs transition active:scale-95 shrink-0 shadow cursor-pointer">
-                        <i class="fa-brands fa-google-drive mr-1"></i> Backup ke Google Drive
+                    <button onclick="switchTab('backup')" class="bg-white text-indigo-900 hover:bg-indigo-50 font-bold px-4 py-2 rounded-2xl text-xs transition active:scale-95 shrink-0 shadow cursor-pointer">
+                        <i class="fa-solid fa-download mr-1"></i> Backup Data Lokal
                     </button>
                 </div>
 
@@ -231,46 +229,11 @@
                 </div>
             </section>
 
-            <!-- TAB: GOOGLE DRIVE & CLOUD SYNC -->
-            <section id="tab-cloud" class="tab-content space-y-6 hidden">
+            <!-- TAB: BACKUP & PEMULIHAN DATA -->
+            <section id="tab-backup" class="tab-content space-y-6 hidden">
                 <div>
-                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Sinkronisasi Google Drive & Cloud</h2>
-                    <p class="text-xs text-slate-600 dark:text-slate-400 font-medium">Amankan data Anda langsung ke Google Drive pribadi atau simpan file cadangan ke memori perangkat.</p>
-                </div>
-
-                <!-- Google Drive Sync Card -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-5">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl">
-                            <i class="fa-brands fa-google-drive"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wide">Google Drive Cloud Backup</h3>
-                            <p id="drive-auth-status" class="text-[11px] text-slate-500 font-medium">Status: Belum terhubung ke akun Google</p>
-                        </div>
-                    </div>
-                    <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
-                        <p class="text-xs text-slate-700 dark:text-slate-300 font-medium leading-relaxed">
-                            Sinkronisasi akan menyimpan file backup terenkripsi (<code class="bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded text-[10px]">daily_report_backup.json</code>) ke folder khusus di Google Drive Anda sehingga data tidak akan pernah hilang meskipun browser/perangkat di-reset.
-                        </p>
-                        <div class="flex flex-wrap gap-3 pt-2">
-                            <button id="btn-google-login" onclick="handleGoogleLogin()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4.5 py-2.5 rounded-xl text-xs flex items-center space-x-2 transition active:scale-95 cursor-pointer shadow-md">
-                                <i class="fa-brands fa-google"></i>
-                                <span>Hubungkan Google Drive</span>
-                            </button>
-                            <button id="btn-drive-backup" onclick="uploadToGoogleDrive()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4.5 py-2.5 rounded-xl text-xs flex items-center space-x-2 transition active:scale-95 cursor-pointer shadow-md hidden">
-                                <i class="fa-solid fa-cloud-arrow-up"></i>
-                                <span>Backup Sekarang ke Drive</span>
-                            </button>
-                            <button id="btn-drive-restore" onclick="downloadFromGoogleDrive()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4.5 py-2.5 rounded-xl text-xs flex items-center space-x-2 transition active:scale-95 cursor-pointer shadow-md hidden">
-                                <i class="fa-solid fa-cloud-arrow-down"></i>
-                                <span>Pulihkan dari Drive</span>
-                            </button>
-                            <button id="btn-google-logout" onclick="handleGoogleLogout()" class="bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold px-3 py-2.5 rounded-xl text-xs transition active:scale-95 cursor-pointer hidden">
-                                Putuskan Akun
-                            </button>
-                        </div>
-                    </div>
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Backup & Pemulihan Data Lokal</h2>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 font-medium">Simpan file cadangan ke memori perangkat atau pulihkan data dari file .json.</p>
                 </div>
 
                 <!-- Backup & Download ke Penyimpanan Ponsel -->
@@ -506,12 +469,6 @@
         let formActivities = [];
         let currentReportData = null;
         let customModalCallback = null;
-        let googleAccessToken = localStorage.getItem('g_access_token') || null;
-
-        // Konfigurasi Google Client ID (Opsional: Masukkan Google Client ID Anda jika ingin koneksi live API Drive)
-        const CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
-        const SCOPES = 'https://www.googleapis.com/auth/drive.file';
-        let tokenClient;
 
         let settings = JSON.parse(localStorage.getItem('company_settings') || JSON.stringify({
             name: 'PT. Solusi Mandiri Utama',
@@ -554,7 +511,6 @@
             }
             setDefaultValues();
             if (formActivities.length === 0) addActivityItem();
-            checkGoogleAuthUI();
         });
 
         function runSplashScreen() {
@@ -595,79 +551,6 @@
                     }
                 };
             });
-        }
-
-        // --- GOOGLE DRIVE AUTH & API SYNC ---
-        function checkGoogleAuthUI() {
-            const statusEl = document.getElementById('drive-auth-status');
-            const btnLogin = document.getElementById('btn-google-login');
-            const btnBackup = document.getElementById('btn-drive-backup');
-            const btnRestore = document.getElementById('btn-drive-restore');
-            const btnLogout = document.getElementById('btn-google-logout');
-
-            if (googleAccessToken) {
-                statusEl.innerText = "Status: Terhubung ke Google Drive Cloud";
-                btnLogin.classList.add('hidden');
-                btnBackup.classList.remove('hidden');
-                btnRestore.classList.remove('hidden');
-                btnLogout.classList.remove('hidden');
-            } else {
-                statusEl.innerText = "Status: Belum terhubung ke akun Google";
-                btnLogin.classList.remove('hidden');
-                btnBackup.classList.add('hidden');
-                btnRestore.classList.add('hidden');
-                btnLogout.classList.add('hidden');
-            }
-        }
-
-        function handleGoogleLogin() {
-            if (CLIENT_ID.includes('YOUR_GOOGLE_CLIENT_ID')) {
-                // Simulasi login sukses untuk demo instan jika Client ID belum disetting Google Console
-                showCustomModal("Simulasi Cloud Sync", "Mode simulasi Google Drive aktif. Data laporan berhasil disinkronkan secara aman ke token awan lokal.", false, "fa-solid fa-circle-check");
-                googleAccessToken = "simulated_token_" + Date.now();
-                localStorage.setItem('g_access_token', googleAccessToken);
-                checkGoogleAuthUI();
-                return;
-            }
-
-            try {
-                tokenClient = google.accounts.oauth2.initTokenClient({
-                    client_id: CLIENT_ID,
-                    scope: SCOPES,
-                    callback: (response) => {
-                        if (response && response.access_token) {
-                            googleAccessToken = response.access_token;
-                            localStorage.setItem('g_access_token', googleAccessToken);
-                            checkGoogleAuthUI();
-                            showCustomModal("Berhasil", "Akun Google Drive berhasil dihubungkan!", false, "fa-solid fa-circle-check");
-                        }
-                    },
-                });
-                tokenClient.requestAccessToken({ prompt: 'consent' });
-            } catch(e) {
-                showCustomModal("Informasi", "Gagal memuat Google API. Menggunakan sistem cadangan memori ponsel.", false, "fa-solid fa-triangle-exclamation");
-            }
-        }
-
-        function handleGoogleLogout() {
-            googleAccessToken = null;
-            localStorage.removeItem('g_access_token');
-            checkGoogleAuthUI();
-            showCustomModal("Terputus", "Koneksi ke Google Drive telah diputus.", false, "fa-solid fa-circle-info");
-        }
-
-        async function uploadToGoogleDrive() {
-            showCustomModal("Sinkronisasi Cloud", "Mengunggah data laporan ke Google Drive...", false, "fa-solid fa-cloud-arrow-up");
-            setTimeout(() => {
-                showCustomModal("Sukses", "Semua data laporan dan foto berhasil di-backup ke Google Drive Anda!", false, "fa-solid fa-circle-check");
-            }, 1200);
-        }
-
-        async function downloadFromGoogleDrive() {
-            showCustomModal("Sinkronisasi Cloud", "Mengunduh data dari Google Drive...", false, "fa-solid fa-cloud-arrow-down");
-            setTimeout(() => {
-                showCustomModal("Sukses", "Data laporan berhasil dipulihkan dari Google Drive!", false, "fa-solid fa-circle-check");
-            }, 1200);
         }
 
         function toggleSidebar(open) {

@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aplikasi Laporan Kerja Harian Pro</title>
+    <title>Sistem Terpadu Laporan Kerja & M&R Checklist Pro</title>
     <!-- Tailwind CSS v4 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- html2pdf.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Signature Pad CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
                 }
             }
         }
@@ -56,6 +58,12 @@
             animation: cartoonPop 0.8s ease-out forwards, cartoonWobble 1.6s infinite ease-in-out 0.8s; 
         }
         .modal-backdrop { backdrop-filter: blur(8px); }
+        @media print {
+            body { background: white !important; color: black !important; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .print-grid-2 { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 1rem !important; }
+        }
     </style>
 </head>
 <body class="h-full bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased transition-colors duration-300">
@@ -64,17 +72,17 @@
     <div id="custom-modal" class="fixed inset-0 z-50 bg-slate-950/70 modal-backdrop flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
         <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 transform scale-95 transition-transform duration-300">
             <div class="flex items-center space-x-3 mb-3">
-                <div id="modal-icon-container" class="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 flex items-center justify-center text-xl shrink-0 shadow-inner">
+                <div id="modal-icon-container" class="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-xl shrink-0 shadow-inner">
                     <i id="modal-icon" class="fa-solid fa-circle-info"></i>
                 </div>
                 <div>
                     <h3 id="modal-title" class="font-bold text-slate-900 dark:text-white text-sm">Informasi Sistem</h3>
-                    <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Pesan dari Aplikasi Laporan</p>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Pesan Sistem Terpadu</p>
                 </div>
             </div>
             <p id="modal-message" class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed mb-6 font-medium">Pesan detail akan muncul di sini.</p>
             <div class="flex space-x-2">
-                <button id="modal-btn-ok" onclick="closeCustomModal(true)" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition active:scale-95 cursor-pointer">OK</button>
+                <button id="modal-btn-ok" onclick="closeCustomModal(true)" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition active:scale-95 cursor-pointer">OK</button>
                 <button id="modal-btn-cancel" onclick="closeCustomModal(false)" class="flex-1 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold py-2.5 rounded-xl text-xs transition active:scale-95 hidden cursor-pointer">Batal</button>
             </div>
         </div>
@@ -84,11 +92,11 @@
     <div id="splash-screen" class="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center p-6 text-white transition-opacity duration-700">
         <div class="text-center space-y-6 max-w-sm w-full">
             <div id="splash-logo-box" class="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 flex items-center justify-center text-4xl shadow-2xl shadow-blue-500/40 splash-logo-anim border border-blue-400/30 overflow-hidden">
-                <i class="fa-solid fa-clipboard-user text-white"></i>
+                <i class="fa-solid fa-clipboard-check text-white"></i>
             </div>
             <div class="space-y-1.5">
-                <h1 class="text-sm font-bold tracking-tight text-white uppercase">Laporan Kerja Harian Pro</h1>
-                <p id="splash-status" class="text-[11px] text-slate-400 font-medium">Memuat database lokal...</p>
+                <h1 class="text-sm font-bold tracking-tight text-white uppercase">M&R Checklist & Laporan Kerja Pro</h1>
+                <p id="splash-status" class="text-[11px] text-slate-400 font-medium">Memuat modul & database terpadu...</p>
             </div>
             <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden p-0.5 border border-slate-800 shadow-inner">
                 <div id="splash-progress" class="bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 h-full rounded-full transition-all duration-300 w-0"></div>
@@ -97,45 +105,47 @@
         </div>
     </div>
 
+    <!-- MAIN APP WRAPPER -->
     <div id="app-wrapper" class="min-h-full flex flex-col hidden">
+        
         <!-- HEADER -->
-        <header class="bg-white/95 dark:bg-slate-900/90 backdrop-blur-md shadow-xs border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 transition-colors">
+        <header class="bg-white/95 dark:bg-slate-900/90 backdrop-blur-md shadow-xs border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 transition-colors no-print">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <button onclick="toggleSidebar(true)" class="w-10 h-10 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 flex items-center justify-center transition active:scale-95 cursor-pointer shadow-xs border border-slate-300 dark:border-slate-700">
                         <i class="fa-solid fa-bars text-sm"></i>
                     </button>
-                    <div id="header-logo-container" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md overflow-hidden">
-                        <i class="fa-solid fa-briefcase text-lg"></i>
+                    <div id="header-logo-container" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md overflow-hidden shrink-0">
+                        <i class="fa-solid fa-clipboard-check text-lg"></i>
                     </div>
                     <div>
-                        <h1 id="brand-title" class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white whitespace-nowrap">Laporan Kerja Harian</h1>
-                        <p class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold tracking-tight whitespace-nowrap">Persistent Storage System</p>
+                        <h1 id="brand-title" class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white whitespace-nowrap">M&R Checklist & Laporan Kerja Pro</h1>
+                        <p class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold tracking-tight whitespace-nowrap">Unified Reporting & Maintenance System</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-2 shrink-0">
                     <button onclick="appState.toggleDarkMode()" class="w-9 h-9 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 flex items-center justify-center transition-all cursor-pointer shadow-xs border border-slate-300 dark:border-slate-700">
                         <i id="theme-icon" class="fa-solid fa-moon text-xs"></i>
                     </button>
-                    <button onclick="switchTab('create')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold px-3 py-2 rounded-xl shadow-sm flex items-center space-x-1.5 transition active:scale-95 cursor-pointer border border-indigo-500">
-                        <i class="fa-solid fa-plus text-[9px]"></i>
-                        <span>Buat Baru</span>
+                    <button onclick="switchTab('checklist')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold px-3.5 py-2 rounded-xl shadow-sm flex items-center space-x-1.5 transition active:scale-95 cursor-pointer border border-indigo-500">
+                        <i class="fa-solid fa-clipboard-list text-[10px]"></i>
+                        <span>Checklist M&R</span>
                     </button>
                 </div>
             </div>
         </header>
 
         <!-- SIDEBAR DRAWER -->
-        <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-950/60 z-40 hidden backdrop-blur-xs transition-opacity"></div>
-        <aside id="sidebar-menu" class="fixed top-0 bottom-0 left-0 w-72 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 z-50 transform -translate-x-full transition-transform duration-300 flex flex-col shadow-2xl border-r border-slate-200 dark:border-slate-800">
+        <div id="sidebar-backdrop" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-950/60 z-40 hidden backdrop-blur-xs transition-opacity no-print"></div>
+        <aside id="sidebar-menu" class="fixed top-0 bottom-0 left-0 w-72 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 z-50 transform -translate-x-full transition-transform duration-300 flex flex-col shadow-2xl border-r border-slate-200 dark:border-slate-800 no-print">
             <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div id="sidebar-logo-box" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-base shadow-md overflow-hidden">
+                    <div id="sidebar-logo-box" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-base shadow-md overflow-hidden shrink-0">
                         <i class="fa-solid fa-building-shield"></i>
                     </div>
                     <div>
-                        <h3 id="sidebar-company-title" class="font-bold text-xs tracking-wide leading-tight truncate max-w-[130px] text-slate-900 dark:text-white">Solusi Mandiri</h3>
-                        <p class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">Panel Menu Utama</p>
+                        <h3 id="sidebar-company-title" class="font-bold text-xs tracking-wide leading-tight truncate max-w-[130px] text-slate-900 dark:text-white">M&R System</h3>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">Navigasi Modul Utama</p>
                     </div>
                 </div>
                 <button onclick="toggleSidebar(false)" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition active:scale-95 cursor-pointer">
@@ -143,13 +153,25 @@
                 </button>
             </div>
             <div class="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
+                <button onclick="switchTab('checklist'); toggleSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition group cursor-pointer">
+                    <div class="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center transition"><i class="fa-solid fa-clipboard-check text-xs"></i></div>
+                    <span>Modul M&R Checklist</span>
+                </button>
                 <button onclick="switchTab('home'); toggleSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition group cursor-pointer">
                     <div class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center transition"><i class="fa-solid fa-house text-xs"></i></div>
-                    <span>Beranda / Riwayat</span>
+                    <span>Riwayat Laporan Harian</span>
+                </button>
+                <button onclick="switchTab('weekly'); toggleSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition group cursor-pointer">
+                    <div class="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center transition"><i class="fa-solid fa-calendar-week text-xs"></i></div>
+                    <span>Rekap Laporan Mingguan</span>
                 </button>
                 <button onclick="switchTab('create'); toggleSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition group cursor-pointer">
                     <div class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition"><i class="fa-solid fa-circle-plus text-xs"></i></div>
-                    <span>Buat Laporan Baru</span>
+                    <span>Buat Laporan Kerja Baru</span>
+                </button>
+                <button onclick="switchTab('master'); toggleSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition group cursor-pointer">
+                    <div class="w-7 h-7 rounded-lg bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-teal-400 flex items-center justify-center transition"><i class="fa-solid fa-database text-xs"></i></div>
+                    <span>Master Item Checklist</span>
                 </button>
                 <button onclick="switchTab('backup'); toggleSidebar(false);" class="w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition group cursor-pointer">
                     <div class="w-7 h-7 rounded-lg bg-violet-100 dark:bg-violet-950 text-violet-600 dark:text-violet-400 flex items-center justify-center transition"><i class="fa-solid fa-mobile-screen-button text-xs"></i></div>
@@ -161,24 +183,177 @@
                 </button>
             </div>
             <div class="p-4 border-t border-slate-200 dark:border-slate-800 text-center">
-                <p class="text-[10px] text-slate-500 font-semibold">&copy; 2026 Daily Report System Pro</p>
+                <p class="text-[10px] text-slate-500 font-semibold">&copy; 2026 M&R & Daily Report Pro</p>
             </div>
         </aside>
 
-        <!-- CONTENT TABS -->
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- CONTENT TABS CONTAINER -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
             
-            <!-- TAB: HOME / DASHBOARD -->
-            <section id="tab-home" class="tab-content space-y-6">
-                <!-- Status Banner Perlindungan Data -->
+            <!-- ================= TAB: CHECKLIST M&R ================= -->
+            <section id="tab-checklist" class="tab-content space-y-6">
+                <!-- Filter & Mode Card -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 no-print">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900 dark:text-white">Form M&R Checklist Pemeliharaan</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pilih mode laporan (Mingguan/Harian), isi checklist, lampirkan foto temuan, dan tanda tangani.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <div class="bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl flex border border-slate-200 dark:border-slate-700">
+                                <button onclick="setReportMode('weekly')" id="modeWeekly" class="px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white shadow-sm transition cursor-pointer">Mingguan</button>
+                                <button onclick="setReportMode('daily')" id="modeDaily" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">Harian</button>
+                            </div>
+                            <button onclick="checkAllOK()" class="px-3.5 py-2.5 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/50 rounded-2xl text-xs font-bold hover:bg-emerald-100 transition flex items-center cursor-pointer"><i class="fa-solid fa-check-double mr-1.5"></i> Semua OK</button>
+                            <button onclick="switchTab('master')" class="px-3.5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center cursor-pointer"><i class="fa-solid fa-database mr-1.5"></i> Master Item</button>
+                            <button onclick="window.print()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-bold transition shadow flex items-center cursor-pointer"><i class="fa-solid fa-print mr-1.5"></i> Cetak PDF</button>
+                        </div>
+                    </div>
+
+                    <!-- Metadata Inputs -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-5 pt-5 border-t border-slate-100 dark:border-slate-800">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Periode / Bulan</label>
+                            <input type="text" id="metaMonth" value="Oktober 2026" class="w-full text-xs border border-slate-300 dark:border-slate-700 rounded-2xl px-3.5 py-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5" id="labelPeriodNumber">Minggu Ke-</label>
+                            <input type="text" id="metaWeekNumber" value="Minggu ke-1" class="w-full text-xs border border-slate-300 dark:border-slate-700 rounded-2xl px-3.5 py-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Tanggal Cek / Pelaporan</label>
+                            <input type="date" id="metaDate" class="w-full text-xs border border-slate-300 dark:border-slate-700 rounded-2xl px-3.5 py-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Printable Header info (Hanya tampil saat print) -->
+                <div class="hidden print-only mb-6 text-center border-b pb-4">
+                    <div class="flex justify-center items-center space-x-4 mb-2">
+                        <img id="printLogo" src="" class="w-12 h-12 object-contain hidden" alt="Logo">
+                        <div>
+                            <h1 id="printCompanyName" class="text-2xl font-bold">M&R SYSTEM</h1>
+                            <p id="printCompanyAddress" class="text-xs text-slate-500 mt-0.5">Alamat Perusahaan</p>
+                            <p class="text-xs text-slate-600 uppercase tracking-widest font-bold mt-1" id="printReportTitle">LAPORAN PEMELIHARAAN MINGGUAN</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-center space-x-6 text-xs text-slate-600 mt-2">
+                        <span>Bulan: <strong id="printMonth">-</strong></span>
+                        <span>Periode: <strong id="printWeek">-</strong></span>
+                        <span>Tanggal: <strong id="printDateVal">-</strong></span>
+                    </div>
+                </div>
+
+                <!-- Stats / Progress Bar -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 no-print">
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <p class="text-xs text-slate-500 font-semibold">Total Item</p>
+                        <h3 id="statTotal" class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1">0</h3>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <p class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">Sesuai (OK)</p>
+                        <h3 id="statOk" class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">0</h3>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <p class="text-xs text-rose-600 dark:text-rose-400 font-semibold">Perbaikan (NOK)</p>
+                        <h3 id="statNok" class="text-2xl font-extrabold text-rose-600 dark:text-rose-400 mt-1">0</h3>
+                    </div>
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <p class="text-xs text-slate-500 font-semibold">Penyelesaian</p>
+                        <div class="flex items-center space-x-2 mt-1.5">
+                            <div class="flex-grow bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                                <div id="statProgressBar" class="bg-indigo-600 h-full w-0 transition-all"></div>
+                            </div>
+                            <span id="statProgressText" class="text-xs font-bold text-slate-700 dark:text-slate-300">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search & Filter Bar -->
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-3 no-print">
+                    <div class="w-full md:w-80 relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400"><i class="fa-solid fa-search text-xs"></i></span>
+                        <input type="text" id="searchInput" oninput="renderChecklist()" placeholder="Cari item, sub-kategori, atau standar..." class="w-full pl-9 pr-4 py-2.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-slate-100 font-medium">
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
+                        <select id="statusFilterSelect" onchange="renderChecklist()" class="text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3.5 py-2.5 font-semibold text-slate-700 dark:text-slate-300 focus:outline-none">
+                            <option value="All">Semua Status</option>
+                            <option value="OK">Hanya OK</option>
+                            <option value="NOK">Hanya NOK (Perbaikan)</option>
+                            <option value="NA">Hanya N/A</option>
+                        </select>
+                        <div id="categoryFilterTabs" class="flex flex-wrap gap-1"></div>
+                    </div>
+                </div>
+
+                <!-- Checklist View Table -->
+                <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100/70 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 text-xs uppercase tracking-wider font-bold border-b border-slate-200 dark:border-slate-800">
+                                    <th class="py-3 px-4">Kategori & Sub</th>
+                                    <th class="py-3 px-4">Item & Standar Passing</th>
+                                    <th class="py-3 px-4 text-center">Durasi / SLA</th>
+                                    <th class="py-3 px-4 text-center">Status</th>
+                                    <th class="py-3 px-4">Catatan & Foto</th>
+                                </tr>
+                            </thead>
+                            <tbody id="checklistTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Signatures -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-6 print-grid-2">
+                    <div class="border border-slate-200 dark:border-slate-800 rounded-2xl p-4.5 flex flex-col justify-between bg-slate-50/40 dark:bg-slate-800/30">
+                        <div>
+                            <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm mb-2 flex items-center"><i class="fa-solid fa-user-pen mr-2 text-indigo-600"></i>Operations Supervisor</h3>
+                            <input type="text" id="opsName" placeholder="Nama Supervisor" class="w-full text-xs border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 mb-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Tanda Tangan Digital:</label>
+                            <div class="border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-white h-32 relative overflow-hidden flex items-center justify-center shadow-inner">
+                                <canvas id="sigOps" class="absolute inset-0 w-full h-full cursor-crosshair touch-none"></canvas>
+                                <span id="placeholderSigOps" class="text-xs text-slate-400 pointer-events-none">Tandatangan di sini</span>
+                            </div>
+                            <div class="flex justify-between items-center mt-2 no-print">
+                                <span class="text-[10px] text-slate-400">Gunakan jari / mouse</span>
+                                <button onclick="clearSignature('ops')" class="text-xs text-rose-600 hover:underline font-bold flex items-center cursor-pointer"><i class="fa-solid fa-rotate-right mr-1"></i>Reset</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 dark:border-slate-800 rounded-2xl p-4.5 flex flex-col justify-between bg-slate-50/40 dark:bg-slate-800/30">
+                        <div>
+                            <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm mb-2 flex items-center"><i class="fa-solid fa-screwdriver-wrench mr-2 text-indigo-600"></i>M&R Technician</h3>
+                            <input type="text" id="techName" placeholder="Nama Teknisi" class="w-full text-xs border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 mb-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Tanda Tangan Digital:</label>
+                            <div class="border border-dashed border-slate-300 dark:border-slate-700 rounded-xl bg-white h-32 relative overflow-hidden flex items-center justify-center shadow-inner">
+                                <canvas id="sigTech" class="absolute inset-0 w-full h-full cursor-crosshair touch-none"></canvas>
+                                <span id="placeholderSigTech" class="text-xs text-slate-400 pointer-events-none">Tandatangan di sini</span>
+                            </div>
+                            <div class="flex justify-between items-center mt-2 no-print">
+                                <span class="text-[10px] text-slate-400">Gunakan jari / mouse</span>
+                                <button onclick="clearSignature('tech')" class="text-xs text-rose-600 hover:underline font-bold flex items-center cursor-pointer"><i class="fa-solid fa-rotate-right mr-1"></i>Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB: HOME / RIWAYAT HARIAN ================= -->
+            <section id="tab-home" class="tab-content space-y-6 hidden">
                 <div class="bg-gradient-to-r from-indigo-900 to-violet-900 text-white p-4 rounded-3xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-lg">
                             <i class="fa-solid fa-shield-halved text-indigo-300"></i>
                         </div>
                         <div>
-                            <h4 class="text-xs font-bold">Perlindungan Data Aktif</h4>
-                            <p class="text-[11px] text-indigo-200">Data tersimpan di Database Lokal Ponsel & aman dari pembersihan cache.</p>
+                            <h4 class="text-xs font-bold">Perlindungan Database Aktif</h4>
+                            <p class="text-[11px] text-indigo-200">Data laporan harian tersimpan aman di IndexedDB perangkat Anda.</p>
                         </div>
                     </div>
                     <button onclick="switchTab('backup')" class="bg-white text-indigo-900 hover:bg-indigo-50 font-bold px-4 py-2 rounded-2xl text-xs transition active:scale-95 shrink-0 shadow cursor-pointer">
@@ -191,7 +366,7 @@
                         <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-center justify-center text-center">
                             <div class="p-4 bg-indigo-50 dark:bg-indigo-950/40 rounded-2xl border border-indigo-100 dark:border-indigo-900/40 w-full">
                                 <span class="block text-3xl font-bold text-indigo-600 dark:text-indigo-400" id="stat-total">0</span>
-                                <span class="text-xs text-slate-700 dark:text-slate-400 font-bold">Total Laporan</span>
+                                <span class="text-xs text-slate-700 dark:text-slate-400 font-bold">Total Laporan Harian Tersimpan</span>
                             </div>
                         </div>
                     </div>
@@ -200,7 +375,7 @@
                             <div class="flex items-center space-x-2 flex-1 min-w-[220px]">
                                 <div class="relative w-full">
                                     <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
-                                    <input type="text" id="search-input" oninput="renderReports()" placeholder="Cari pelapor, lokasi, atau kegiatan..." class="w-full pl-9 pr-4 py-2.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium">
+                                    <input type="text" id="search-input" oninput="renderReports()" placeholder="Cari teknisi, operasional, lokasi..." class="w-full pl-9 pr-4 py-2.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none transition font-medium">
                                 </div>
                             </div>
                             <input type="date" id="filter-date" onchange="renderReports()" class="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-3.5 py-2.5 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-slate-100 font-medium transition">
@@ -208,7 +383,6 @@
                     </div>
                 </div>
 
-                <!-- Report List Section -->
                 <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
                     <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
                         <h3 class="font-bold text-sm text-slate-900 dark:text-white">Daftar Laporan Kerja Harian</h3>
@@ -219,55 +393,146 @@
                         <div class="w-16 h-16 bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 rounded-3xl flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
                             <i class="fa-solid fa-file-circle-exclamation"></i>
                         </div>
-                        <p class="text-sm font-bold text-slate-900 dark:text-slate-100">Belum Ada Laporan</p>
-                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 max-w-xs mx-auto font-medium">Mulai buat laporan kerja harian Anda dengan menekan tombol Buat Laporan Baru.</p>
-                        <button onclick="switchTab('create')" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4.5 py-2.5 rounded-2xl shadow-md transition active:scale-95 inline-flex items-center space-x-1.5 cursor-pointer">
+                        <p class="text-sm font-bold text-slate-900 dark:text-slate-100">Belum Ada Laporan Harian</p>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 max-w-xs mx-auto font-medium">Mulai buat laporan kerja harian Anda dengan menekan tombol di bawah.</p>
+                        <button onclick="switchTab('create')" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4.5 py-2.5 rounded-2xl shadow-md transition active:scale-95 inline-flex items-center space-x-1.5 cursor-pointer">
                             <i class="fa-solid fa-plus"></i>
-                            <span>Buat Laporan Sekarang</span>
+                            <span>Buat Laporan Baru</span>
                         </button>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB: BACKUP & PEMULIHAN DATA -->
-            <section id="tab-backup" class="tab-content space-y-6 hidden">
+            <!-- ================= TAB: LAPORAN MINGGUAN (DENGAN TANDA TANGAN) ================= -->
+            <section id="tab-weekly" class="tab-content space-y-6 hidden">
                 <div>
-                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Backup & Pemulihan Data Lokal</h2>
-                    <p class="text-xs text-slate-600 dark:text-slate-400 font-medium">Simpan file cadangan ke memori perangkat atau pulihkan data dari file .json.</p>
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Rekap Laporan Mingguan Harian</h2>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 font-medium">Pilih rentang tanggal minggu untuk menghasilkan rekap otomatis beserta tanda tangan.</p>
                 </div>
 
-                <!-- Backup & Download ke Penyimpanan Ponsel -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl">
-                            <i class="fa-solid fa-mobile-screen-button"></i>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4 no-print">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Tanggal Mulai (Awal Minggu)*</label>
+                            <input type="date" id="weekly-start-date" onchange="generateWeeklyReport()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-purple-500 transition">
                         </div>
                         <div>
-                            <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wide">Penyimpanan Lokal Ponsel (.json)</h3>
-                            <p class="text-[11px] text-slate-500 font-medium">Simpan file fisik ke memori internal perangkat Android/iOS</p>
+                            <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Tanggal Selesai (Akhir Minggu)*</label>
+                            <input type="date" id="weekly-end-date" onchange="generateWeeklyReport()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-purple-500 transition">
                         </div>
                     </div>
-                    <p class="text-xs text-slate-600 dark:text-slate-400 font-medium">Unduh file cadangan ke folder Download ponsel Anda. File ini dapat di-import kembali kapan saja.</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-                        <button onclick="downloadJsonBackup()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-2xl text-xs shadow-md transition active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
-                            <i class="fa-solid fa-download text-sm"></i>
-                            <span>Download ke Memori Ponsel</span>
+
+                    <!-- Input Nama Penandatangan Rekap Mingguan -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Nama Teknisi (Rekap Mingguan)</label>
+                            <input type="text" id="weekly-tech-name-input" placeholder="Contoh: Budi Santoso" oninput="updateWeeklySignerNames()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-900 dark:text-slate-100 font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Nama Operasional / SPV (Rekap Mingguan)</label>
+                            <input type="text" id="weekly-ops-name-input" placeholder="Contoh: Andi Wijaya" oninput="updateWeeklySignerNames()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-900 dark:text-slate-100 font-medium">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-2 pt-2">
+                        <button onclick="generateWeeklyReport()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-4 rounded-2xl text-xs transition active:scale-95 cursor-pointer flex items-center space-x-1.5">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                            <span>Muat Rekap Mingguan</span>
                         </button>
-                        <label class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-2xl text-xs shadow-md transition active:scale-95 flex items-center justify-center space-x-2 cursor-pointer text-center">
-                            <i class="fa-solid fa-upload text-sm"></i>
-                            <span>Import File dari Ponsel</span>
-                            <input type="file" id="import-file" accept=".json" onchange="restoreJsonBackup(event)" class="hidden">
-                        </label>
+                        <button onclick="downloadWeeklyPDF()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-2xl text-xs transition active:scale-95 cursor-pointer flex items-center space-x-1.5">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>Download PDF Mingguan</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Canvas Tanda Tangan untuk Rekap Mingguan -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4 no-print">
+                    <h3 class="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wide flex items-center"><i class="fa-solid fa-signature mr-1.5"></i> Tanda Tangan Dokumen Mingguan</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-800 dark:text-slate-300">Tanda Tangan Teknisi</label>
+                            <div class="border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden bg-white">
+                                <canvas id="canvas-weekly-tech" class="w-full h-32 border-b border-slate-200"></canvas>
+                                <div class="p-2 bg-slate-50 flex justify-between items-center">
+                                    <span class="text-[10px] text-slate-500">Usap untuk tanda tangan</span>
+                                    <button type="button" onclick="clearWeeklySignature('tech')" class="text-[10px] font-bold text-rose-600 hover:text-rose-800 px-2 py-1 bg-rose-50 rounded-lg">Bersihkan</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-800 dark:text-slate-300">Tanda Tangan Operasional / SPV</label>
+                            <div class="border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden bg-white">
+                                <canvas id="canvas-weekly-ops" class="w-full h-32 border-b border-slate-200"></canvas>
+                                <div class="p-2 bg-slate-50 flex justify-between items-center">
+                                    <span class="text-[10px] text-slate-500">Usap untuk tanda tangan</span>
+                                    <button type="button" onclick="clearWeeklySignature('ops')" class="text-[10px] font-bold text-rose-600 hover:text-rose-800 px-2 py-1 bg-rose-50 rounded-lg">Bersihkan</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Printable Area Rekap Mingguan -->
+                <div id="weekly-print-area" class="bg-white text-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-300 shadow-sm space-y-4 text-xs font-medium">
+                    <div class="border-b-2 border-slate-900 pb-4 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div id="weekly-print-logo-box" class="w-12 h-12 rounded-xl border border-slate-300 flex items-center justify-center overflow-hidden bg-slate-50 shrink-0">
+                                <i class="fa-solid fa-building text-slate-700 text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 id="weekly-detail-company-name" class="font-bold text-sm sm:text-base text-slate-900 leading-tight">Solusi Mandiri</h3>
+                                <p id="weekly-detail-company-address" class="text-[10px] text-slate-700 mt-0.5 font-semibold">Jl. Jendral Sudirman Kav. 45</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="bg-purple-100 text-purple-900 text-[10px] font-bold px-3 py-1 rounded-xl border border-purple-400 uppercase tracking-wider whitespace-nowrap">Laporan Mingguan</span>
+                        </div>
+                    </div>
+
+                    <h2 class="text-center font-bold text-sm sm:text-base text-slate-900 tracking-tight py-1 uppercase whitespace-nowrap">REKAPITULASI LAPORAN KERJA MINGGUAN</h2>
+
+                    <div class="bg-slate-50 rounded-2xl p-4 flex justify-between items-center border border-slate-300">
+                        <div>
+                            <span class="block text-[10px] text-slate-700 font-bold">Periode Minggu:</span>
+                            <span id="weekly-det-range" class="font-bold text-slate-900 text-xs sm:text-sm">-</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="block text-[10px] text-slate-700 font-bold">Total Laporan:</span>
+                            <span id="weekly-det-count" class="font-bold text-slate-900 text-xs sm:text-sm">0 Laporan</span>
+                        </div>
+                    </div>
+
+                    <div id="weekly-reports-container" class="space-y-4"></div>
+
+                    <!-- Tanda Tangan Cetak Rekap Mingguan -->
+                    <div class="pt-6 border-t border-slate-300 grid grid-cols-2 gap-4 text-center mt-6">
+                        <div class="space-y-2">
+                            <p class="text-[11px] font-bold text-slate-800">Teknisi Lapangan</p>
+                            <div class="h-20 flex items-center justify-center border border-dashed border-slate-300 rounded-xl bg-slate-50 p-1">
+                                <img id="weekly-det-sig-tech" src="" class="max-h-full max-w-full object-contain hidden">
+                                <span id="weekly-det-sig-tech-empty" class="text-[10px] text-slate-400 font-medium">(Tidak ada tanda tangan)</span>
+                            </div>
+                            <p id="weekly-det-author-name" class="font-bold text-xs text-slate-900 underline">-</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[11px] font-bold text-slate-800">Operasional / SPV</p>
+                            <div class="h-20 flex items-center justify-center border border-dashed border-slate-300 rounded-xl bg-slate-50 p-1">
+                                <img id="weekly-det-sig-ops" src="" class="max-h-full max-w-full object-contain hidden">
+                                <span id="weekly-det-sig-ops-empty" class="text-[10px] text-slate-400 font-medium">(Tidak ada tanda tangan)</span>
+                            </div>
+                            <p id="weekly-det-ops-name" class="font-bold text-xs text-slate-900 underline">-</p>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB: CREATE / EDIT REPORT FORM -->
+            <!-- ================= TAB: CREATE / EDIT REPORT ================= -->
             <section id="tab-create" class="tab-content space-y-6 hidden">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 id="form-title" class="text-base font-bold text-slate-900 dark:text-white">Form Laporan Kerja</h2>
-                        <p class="text-xs text-slate-600 dark:text-slate-400 font-medium">Catat rincian kegiatan dan foto dokumentasi lapangan</p>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 font-medium">Catat rincian kegiatan, foto dokumentasi, dan tanda tangan</p>
                     </div>
                     <button onclick="switchTab('home')" class="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 px-4 py-2.5 rounded-2xl shadow-xs transition cursor-pointer hover:bg-slate-100">Batal</button>
                 </div>
@@ -283,16 +548,24 @@
                                 <input type="date" id="report-date" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 transition">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Nama Pelapor*</label>
-                                <input type="text" id="report-author" required placeholder="Contoh: Budi Santoso" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 transition">
+                                <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Lokasi Tugas / Proyek*</label>
+                                <input type="text" id="report-location" required placeholder="Contoh: Area Gedung / Proyek A" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 transition">
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Lokasi Tugas / Proyek*</label>
-                            <input type="text" id="report-location" required placeholder="Contoh: Gedung Perkantoran / Area Proyek A" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 transition">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Nama Teknisi*</label>
+                                <input type="text" id="report-author" required placeholder="Contoh: Budi Santoso" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Nama Operasional / SPV*</label>
+                                <input type="text" id="report-operational" required placeholder="Contoh: Andi Wijaya" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 transition">
+                            </div>
                         </div>
+
                         <div>
-                            <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Jam Kerja Keseluruhan (Mulai - Selesai)*</label>
+                            <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Jam Kerja (Mulai - Selesai)*</label>
                             <div class="flex items-center space-x-2">
                                 <input type="time" id="report-time-start" value="08:00" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 transition">
                                 <span class="text-slate-600 dark:text-slate-400 text-xs font-bold">s/d</span>
@@ -313,6 +586,33 @@
                         <div id="activities-container" class="space-y-4"></div>
                     </div>
 
+                    <!-- Signature Pad Section -->
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+                        <h3 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide flex items-center"><i class="fa-solid fa-signature mr-1.5"></i> Tanda Tangan Lapangan</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-slate-800 dark:text-slate-300">Tanda Tangan Teknisi</label>
+                                <div class="border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden bg-white">
+                                    <canvas id="canvas-tech" class="w-full h-36 border-b border-slate-200"></canvas>
+                                    <div class="p-2 bg-slate-50 flex justify-between items-center">
+                                        <span class="text-[10px] text-slate-500">Usap untuk tanda tangan</span>
+                                        <button type="button" onclick="clearSignature('tech')" class="text-[10px] font-bold text-rose-600 hover:text-rose-800 px-2 py-1 bg-rose-50 rounded-lg">Bersihkan</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-slate-800 dark:text-slate-300">Tanda Tangan Operasional / SPV</label>
+                                <div class="border border-slate-300 dark:border-slate-700 rounded-2xl overflow-hidden bg-white">
+                                    <canvas id="canvas-ops" class="w-full h-36 border-b border-slate-200"></canvas>
+                                    <div class="p-2 bg-slate-50 flex justify-between items-center">
+                                        <span class="text-[10px] text-slate-500">Usap untuk tanda tangan</span>
+                                        <button type="button" onclick="clearSignature('ops')" class="text-[10px] font-bold text-rose-600 hover:text-rose-800 px-2 py-1 bg-rose-50 rounded-lg">Bersihkan</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <button type="submit" id="btn-submit-report" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-2xl shadow-lg text-xs transition active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
                         <i class="fa-solid fa-floppy-disk text-sm"></i>
                         <span id="btn-submit-text">Simpan Laporan Kerja</span>
@@ -320,7 +620,70 @@
                 </form>
             </section>
 
-            <!-- TAB: SETTINGS -->
+            <!-- ================= TAB: MASTER DATA CHECKLIST ================= -->
+            <section id="tab-master" class="tab-content space-y-6 hidden">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Kelola Master Item Checklist M&R</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Tambah, ubah, atau hapus item standar pemeriksaan pemeliharaan.</p>
+                    </div>
+                    <div class="flex items-center space-x-2.5">
+                        <button onclick="openItemModal()" class="px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition shadow flex items-center cursor-pointer"><i class="fa-solid fa-plus mr-1.5"></i> Tambah Item</button>
+                        <button onclick="resetDefaultMasterData()" class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold hover:bg-slate-200 transition flex items-center cursor-pointer"><i class="fa-solid fa-rotate-left mr-1.5"></i> Reset Default</button>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100/70 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 text-xs uppercase tracking-wider font-bold border-b border-slate-200 dark:border-slate-800">
+                                    <th class="py-3 px-4">Kategori</th>
+                                    <th class="py-3 px-4">Sub-Kategori</th>
+                                    <th class="py-3 px-4">Nama Item</th>
+                                    <th class="py-3 px-4">Standar Passing</th>
+                                    <th class="py-3 px-4">Prioritas & SLA</th>
+                                    <th class="py-3 px-4 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="masterTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB: BACKUP & PEMULIHAN ================= -->
+            <section id="tab-backup" class="tab-content space-y-6 hidden">
+                <div>
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Backup & Pemulihan Data Terpadu</h2>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 font-medium">Simpan file cadangan seluruh data ke perangkat atau pulihkan dari file .json.</p>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-mobile-screen-button"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wide">Penyimpanan Lokal & Backup (.json)</h3>
+                            <p class="text-[11px] text-slate-500 font-medium">Cadangkan seluruh laporan harian, checklist, dan master data</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                        <button onclick="exportJSON()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-2xl text-xs shadow-md transition active:scale-95 flex items-center justify-center space-x-2 cursor-pointer">
+                            <i class="fa-solid fa-download text-sm"></i>
+                            <span>Download File Backup (.json)</span>
+                        </button>
+                        <label class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-2xl text-xs shadow-md transition active:scale-95 flex items-center justify-center space-x-2 cursor-pointer text-center">
+                            <i class="fa-solid fa-upload text-sm"></i>
+                            <span>Import Backup File (.json)</span>
+                            <input type="file" id="import-file" accept=".json" onchange="restoreJsonBackup(event)" class="hidden">
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB: SETTINGS & LOGO ================= -->
             <section id="tab-settings" class="tab-content space-y-6 hidden">
                 <div>
                     <h2 class="text-base font-bold text-slate-900 dark:text-white">Pengaturan & Logo Perusahaan</h2>
@@ -328,10 +691,10 @@
                 </div>
 
                 <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-                    <h3 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide flex items-center"><i class="fa-solid fa-building mr-1.5"></i> Identitas & Logo Perusahaan</h3>
+                    <h3 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide flex items-center"><i class="fa-solid fa-building mr-1.5"></i> Identitas & Logo Dokumen</h3>
                     <div>
                         <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Nama Perusahaan / Instansi</label>
-                        <input type="text" id="setting-company-name" placeholder="PT. Solusi Mandiri" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 transition">
+                        <input type="text" id="setting-company-name" placeholder="M&R System" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 p-3 rounded-2xl text-xs text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-indigo-500 transition">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Alamat Kantor</label>
@@ -343,8 +706,8 @@
                             <div id="settings-logo-preview" class="w-14 h-14 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
                                 <i class="fa-solid fa-building text-slate-500 text-xl"></i>
                             </div>
-                            <label class="flex-1 border border-dashed border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/60 rounded-2xl p-3.5 flex items-center justify-center cursor-pointer text-xs text-slate-800 dark:text-slate-200 transition font-bold shadow-2xs">
-                                <i class="fa-solid fa-cloud-arrow-up text-indigo-600 mr-2 text-base"></i> Unggah File Logo Dokumen
+                            <label class="flex-1 border border-dashed border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-2xl p-3.5 flex items-center justify-center cursor-pointer text-xs text-slate-800 dark:text-slate-200 transition font-bold shadow-2xs">
+                                <i class="fa-solid fa-cloud-arrow-up text-indigo-600 mr-2 text-base"></i> Unggah File Logo
                                 <input type="file" accept="image/*" onchange="handleLogoUpload(event)" class="hidden">
                             </label>
                         </div>
@@ -353,10 +716,10 @@
                         <label class="block text-xs font-bold text-slate-800 dark:text-slate-300 mb-1.5">Logo Tampilan Pembuka (Splash Screen)</label>
                         <div class="flex items-center space-x-4">
                             <div id="settings-splash-logo-preview" class="w-14 h-14 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-900 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
-                                <i class="fa-solid fa-clipboard-user text-white text-xl"></i>
+                                <i class="fa-solid fa-clipboard-check text-white text-xl"></i>
                             </div>
-                            <label class="flex-1 border border-dashed border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/60 rounded-2xl p-3.5 flex items-center justify-center cursor-pointer text-xs text-slate-800 dark:text-slate-200 transition font-bold shadow-2xs">
-                                <i class="fa-solid fa-cloud-arrow-up text-blue-500 mr-2 text-base"></i> Unggah File Logo Splash Screen
+                            <label class="flex-1 border border-dashed border-slate-400 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-2xl p-3.5 flex items-center justify-center cursor-pointer text-xs text-slate-800 dark:text-slate-200 transition font-bold shadow-2xs">
+                                <i class="fa-solid fa-cloud-arrow-up text-blue-500 mr-2 text-base"></i> Unggah File Logo Splash
                                 <input type="file" accept="image/*" onchange="handleSplashLogoUpload(event)" class="hidden">
                             </label>
                         </div>
@@ -365,20 +728,19 @@
                 </div>
             </section>
 
-            <!-- TAB: DETAIL -->
+            <!-- ================= TAB: DETAIL LAPORAN HARIAN ================= -->
             <section id="tab-detail" class="tab-content space-y-6 hidden">
-                <div class="flex items-center justify-between">
-                    <button onclick="switchTab('home')" class="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 px-4 py-2.5 rounded-2xl shadow-xs flex items-center space-x-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition active:scale-95 cursor-pointer">
+                <div class="flex items-center justify-between no-print">
+                    <button onclick="switchTab('home')" class="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 px-4 py-2.5 rounded-2xl shadow-xs flex items-center space-x-1.5 hover:bg-slate-100 transition cursor-pointer">
                         <i class="fa-solid fa-arrow-left"></i>
                         <span>Kembali</span>
                     </button>
-                    <button onclick="openDownloadModal()" class="bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white text-xs font-bold px-5 py-3 rounded-2xl shadow-md flex items-center space-x-2 transition active:scale-95 cursor-pointer border border-slate-700 dark:border-slate-600">
+                    <button onclick="openDownloadModal()" class="bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 text-white text-xs font-bold px-5 py-3 rounded-2xl shadow-md flex items-center space-x-2 transition active:scale-95 cursor-pointer border border-slate-700">
                         <i class="fa-solid fa-download text-sm"></i>
                         <span>Download Dokumen</span>
                     </button>
                 </div>
 
-                <!-- Printable Report Document Area -->
                 <div id="print-area" class="bg-white text-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-300 shadow-sm space-y-4 text-xs font-medium">
                     <div class="border-b-2 border-slate-900 pb-4 flex items-center justify-between">
                         <div class="flex items-center space-x-3">
@@ -386,7 +748,7 @@
                                 <i class="fa-solid fa-building text-slate-700 text-lg"></i>
                             </div>
                             <div>
-                                <h3 id="detail-company-name" class="font-bold text-sm sm:text-base text-slate-900 leading-tight">Solusi Mandiri</h3>
+                                <h3 id="detail-company-name" class="font-bold text-sm sm:text-base text-slate-900 leading-tight">M&R System</h3>
                                 <p id="detail-company-address" class="text-[10px] text-slate-700 mt-0.5 font-semibold">Jl. Jendral Sudirman Kav. 45</p>
                             </div>
                         </div>
@@ -403,15 +765,19 @@
                             <span id="det-date" class="font-bold text-slate-900 text-xs sm:text-sm">-</span>
                         </div>
                         <div class="text-right">
-                            <span class="block text-[10px] text-slate-700 font-bold">Nama Pelapor:</span>
+                            <span class="block text-[10px] text-slate-700 font-bold">Lokasi Tugas:</span>
+                            <span id="det-location" class="font-bold text-slate-900 text-xs sm:text-sm">-</span>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] text-slate-700 font-bold">Nama Teknisi:</span>
                             <span id="det-author" class="font-bold text-slate-900 text-xs sm:text-sm">-</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="block text-[10px] text-slate-700 font-bold">Nama Operasional:</span>
+                            <span id="det-operational" class="font-bold text-slate-900 text-xs sm:text-sm">-</span>
                         </div>
                         <div class="col-span-2 pt-2 border-t border-slate-300 flex justify-between items-center">
                             <div>
-                                <span class="block text-[10px] text-slate-700 font-bold">Lokasi Tugas:</span>
-                                <span id="det-location" class="font-bold text-slate-900 text-xs sm:text-sm">-</span>
-                            </div>
-                            <div class="text-right">
                                 <span class="block text-[10px] text-slate-700 font-bold">Jam Kerja:</span>
                                 <span id="det-time-range" class="font-bold text-slate-900 text-xs sm:text-sm">-</span>
                             </div>
@@ -421,6 +787,25 @@
                     <div>
                         <h4 class="font-bold text-slate-900 mb-2.5 uppercase tracking-wide border-b border-slate-300 pb-1.5">Rincian Kegiatan:</h4>
                         <div id="det-activities-container" class="space-y-4"></div>
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-300 grid grid-cols-2 gap-4 text-center">
+                        <div class="space-y-2">
+                            <p class="text-[11px] font-bold text-slate-800">Teknisi Lapangan</p>
+                            <div class="h-20 flex items-center justify-center border border-dashed border-slate-300 rounded-xl bg-slate-50 p-1">
+                                <img id="det-sig-tech" src="" class="max-h-full max-w-full object-contain hidden">
+                                <span id="det-sig-tech-empty" class="text-[10px] text-slate-400 font-medium">(Tidak ada tanda tangan)</span>
+                            </div>
+                            <p id="det-author-name" class="font-bold text-xs text-slate-900 underline">-</p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[11px] font-bold text-slate-800">Operasional / SPV</p>
+                            <div class="h-20 flex items-center justify-center border border-dashed border-slate-300 rounded-xl bg-slate-50 p-1">
+                                <img id="det-sig-ops" src="" class="max-h-full max-w-full object-contain hidden">
+                                <span id="det-sig-ops-empty" class="text-[10px] text-slate-400 font-medium">(Tidak ada tanda tangan)</span>
+                            </div>
+                            <p id="det-ops-name" class="font-bold text-xs text-slate-900 underline">-</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -451,7 +836,6 @@
                         <option value="pdf">Dokumen PDF (.pdf)</option>
                         <option value="doc">Dokumen Word (.doc)</option>
                         <option value="txt">Teks Terstruktur (.txt)</option>
-                        <option value="json">Backup Data Ponsel (.json)</option>
                     </select>
                 </div>
                 <button onclick="executeDownload()" class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-xs flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/20 transition active:scale-95 cursor-pointer">
@@ -462,6 +846,63 @@
         </div>
     </div>
 
+    <!-- MASTER ITEM MODAL -->
+    <div id="itemModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-slate-800">
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 id="modalTitle" class="font-bold text-base text-slate-900 dark:text-white">Tambah Item Checklist</h3>
+                <button onclick="closeItemModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <input type="hidden" id="editItemIndex" value="-1">
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Kategori</label>
+                    <input type="text" id="formCategory" placeholder="Contoh: Building, MEP, dll" class="w-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Sub-Kategori</label>
+                    <input type="text" id="formSubCategory" placeholder="Contoh: Interior, Listrik, dll" class="w-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Item / Unit</label>
+                    <input type="text" id="formItemName" placeholder="Contoh: Pintu & Jendela" class="w-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Passing Standard (Kondisi Kelayakan)</label>
+                    <textarea id="formPassing" rows="2" placeholder="Standar kelayakan..." class="w-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Prioritas SLA</label>
+                        <select id="formPriority" class="w-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="Tinggi Sekali (Darurat) - 12 jam">Tinggi Sekali (12 jam)</option>
+                            <option value="Tinggi (Tepat Waktu) - 1 hari">Tinggi (1 hari)</option>
+                            <option value="Sedang (Terkendali) - 1-3 hari" selected>Sedang (1-3 hari)</option>
+                            <option value="Rendah (Terjadwal) - 3-7 hari">Rendah (3-7 hari)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Durasi Cek</label>
+                        <input type="text" id="formDuration" value="Weekly" class="w-full border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-3 border-t border-slate-200 dark:border-slate-800">
+                <button onclick="closeItemModal()" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold hover:bg-slate-200">Batal</button>
+                <button onclick="saveMasterItem()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700">Simpan Item</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Zoom Modal -->
+    <div id="imageModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4" onclick="closeImageModal()">
+        <div class="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center">
+            <img id="modalImagePreview" src="" class="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl border border-white/20">
+            <button class="absolute top-4 right-4 text-white bg-black/50 hover:bg-black w-10 h-10 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
         let db;
         let reports = [];
@@ -470,19 +911,39 @@
         let currentReportData = null;
         let customModalCallback = null;
 
+        let sigPadTech = null;
+        let sigPadOps = null;
+        let sigPadWeeklyTech = null;
+        let sigPadWeeklyOps = null;
+
         let settings = JSON.parse(localStorage.getItem('company_settings') || JSON.stringify({
-            name: 'PT. Solusi Mandiri Utama',
+            name: 'M&R System & Solutions',
             address: 'Jl. Jendral Sudirman Kav. 45, Jakarta Selatan',
             logo: '',
             splashLogo: ''
         }));
 
+        const defaultMasterItems = [
+            { cat: "Building", sub: "Interior", name: "Pintu & Jendela", passing: "Kaca terpasang, engsel tidak macet/berbunyi, bisa dikunci", priority: "Sedang (Terkendali) - 1-3 hari", duration: "Weekly" },
+            { cat: "Building", sub: "Interior", name: "Cermin", passing: "Tidak retak, lampu belakang menyala", priority: "Sedang (Terkendali) - 1-3 hari", duration: "Weekly" },
+            { cat: "Building", sub: "Interior", name: "Wastafel", passing: "Tidak mampat dan tidak bocor", priority: "Sedang (Terkendali) - 1-3 hari", duration: "Weekly" },
+            { cat: "Building", sub: "Interior", name: "Lantai", passing: "Tidak copot, tidak pecah", priority: "Sedang (Terkendali) - 1-3 hari", duration: "Weekly" },
+            { cat: "Infrastruktur", sub: "Paving", name: "Paving & Kanstin", passing: "Rata, tidak bergelombang, tidak lepas atau pecah", priority: "Rendah (Terjadwal) - 3-7 hari", duration: "Weekly" },
+            { cat: "MEP", sub: "Listrik", name: "Panel Genset ATS", passing: "Lampu indikator menyala, switch manual/otomatis normal", priority: "Tinggi Sekali (Darurat) - 12 jam", duration: "Weekly" },
+            { cat: "MEP", sub: "AC Split", name: "AC Split (Indoor/Outdoor)", passing: "Suhu 17-19°C, filter bersih, drainase lancar", priority: "Sedang (Terkendali) - 1-3 hari", duration: "Weekly" },
+            { cat: "Equipment", sub: "Pendingin", name: "Walk In Chiller / Freezer", passing: "Suhu normal sesuai setting, karet pintu rapat", priority: "Tinggi Sekali (Darurat) - 12 jam", duration: "Weekly" }
+        ];
+
+        let masterItems = JSON.parse(localStorage.getItem('mr_master_items')) || defaultMasterItems;
+        let currentReportMode = 'weekly';
+        let reportDataWeekly = JSON.parse(localStorage.getItem('mr_report_data_weekly')) || {};
+        let reportDataDaily = JSON.parse(localStorage.getItem('mr_report_data_daily')) || {};
+        let selectedCategoryFilter = 'All';
+
         function formatDateToID(dateString) {
             if (!dateString) return '-';
             const parts = dateString.split('-');
-            if (parts.length === 3) {
-                return `${parts[2]}/${parts[1]}/${parts[0]}`;
-            }
+            if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
             return dateString;
         }
 
@@ -507,10 +968,17 @@
                 await initDB();
                 await loadReportsFromDB();
             } catch (e) {
-                console.error("DB initialization error:", e);
+                console.error("DB Init Error:", e);
             }
             setDefaultValues();
+            initSignaturePads();
+            initWeeklySignaturePads();
+            initChecklistSignatures();
             if (formActivities.length === 0) addActivityItem();
+            setDefaultWeeklyDates();
+            renderCategoryTabs();
+            renderChecklist();
+            renderMasterTable();
         });
 
         function runSplashScreen() {
@@ -541,7 +1009,7 @@
 
         function initDB() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open('FastWorkReportProDB', 3);
+                const request = indexedDB.open('UnifiedWorkReportProDB', 4);
                 request.onerror = (event) => reject(event.target.error);
                 request.onsuccess = (event) => { db = event.target.result; resolve(db); };
                 request.onupgradeneeded = (event) => {
@@ -551,6 +1019,117 @@
                     }
                 };
             });
+        }
+
+        function initSignaturePads() {
+            const canvasTech = document.getElementById('canvas-tech');
+            const canvasOps = document.getElementById('canvas-ops');
+            if (canvasTech && canvasOps) {
+                sigPadTech = new SignaturePad(canvasTech, { backgroundColor: 'rgb(255, 255, 255)' });
+                sigPadOps = new SignaturePad(canvasOps, { backgroundColor: 'rgb(255, 255, 255)' });
+                resizeCanvas(canvasTech);
+                resizeCanvas(canvasOps);
+            }
+        }
+
+        function initWeeklySignaturePads() {
+            const canvasWeeklyTech = document.getElementById('canvas-weekly-tech');
+            const canvasWeeklyOps = document.getElementById('canvas-weekly-ops');
+            if (canvasWeeklyTech && canvasWeeklyOps) {
+                sigPadWeeklyTech = new SignaturePad(canvasWeeklyTech, { backgroundColor: 'rgb(255, 255, 255)' });
+                sigPadWeeklyOps = new SignaturePad(canvasWeeklyOps, { backgroundColor: 'rgb(255, 255, 255)' });
+                resizeCanvas(canvasWeeklyTech);
+                resizeCanvas(canvasWeeklyOps);
+            }
+        }
+
+        function clearWeeklySignature(type) {
+            if (type === 'tech' && sigPadWeeklyTech) sigPadWeeklyTech.clear();
+            if (type === 'ops' && sigPadWeeklyOps) sigPadWeeklyOps.clear();
+        }
+
+        function updateWeeklySignerNames() {
+            const techName = document.getElementById('weekly-tech-name-input').value;
+            const opsName = document.getElementById('weekly-ops-name-input').value;
+            document.getElementById('weekly-det-author-name').innerText = techName || '-';
+            document.getElementById('weekly-det-ops-name').innerText = opsName || '-';
+        }
+
+        function initChecklistSignatures() {
+            setupChecklistCanvas('sigOps', 'placeholderSigOps');
+            setupChecklistCanvas('sigTech', 'placeholderSigTech');
+        }
+
+        function setupChecklistCanvas(canvasId, placeholderId) {
+            const canvas = document.getElementById(canvasId);
+            const placeholder = document.getElementById(placeholderId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+
+            function resize() {
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            function startDraw(e) {
+                drawing = true;
+                if (placeholder) placeholder.style.display = 'none';
+                ctx.beginPath();
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                ctx.moveTo(x, y);
+            }
+
+            function draw(e) {
+                if(!drawing) return;
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                ctx.lineTo(x, y);
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 2.5;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            }
+
+            function endDraw() { drawing = false; }
+
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', draw);
+            window.addEventListener('mouseup', endDraw);
+            canvas.addEventListener('touchstart', startDraw);
+            canvas.addEventListener('touchmove', draw);
+            canvas.addEventListener('touchend', endDraw);
+        }
+
+        function resizeCanvas(canvas) {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+        }
+
+        function clearSignature(type) {
+            if (type === 'tech' && sigPadTech) sigPadTech.clear();
+            if (type === 'ops' && sigPadOps) sigPadOps.clear();
+            if (type === 'ops-chk') {
+                const canvas = document.getElementById('sigOps');
+                const placeholder = document.getElementById('placeholderSigOps');
+                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                if (placeholder) placeholder.style.display = 'block';
+            }
+            if (type === 'tech-chk') {
+                const canvas = document.getElementById('sigTech');
+                const placeholder = document.getElementById('placeholderSigTech');
+                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                if (placeholder) placeholder.style.display = 'block';
+            }
         }
 
         function toggleSidebar(open) {
@@ -567,10 +1146,11 @@
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            if (tabId === 'create' && !editingId && formActivities.length === 0) {
-                resetForm();
-            }
+            const targetTab = document.getElementById(`tab-${tabId}`);
+            if (targetTab) targetTab.classList.remove('hidden');
+            if (tabId === 'create' && !editingId && formActivities.length === 0) resetForm();
+            if (tabId === 'weekly') generateWeeklyReport();
+            if (tabId === 'checklist') renderChecklist();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -590,7 +1170,7 @@
                 sidebarLogo.innerHTML = `<img src="${settings.logo}" class="w-full h-full object-cover">`;
                 settingsLogoPrev.innerHTML = `<img src="${settings.logo}" class="w-full h-full object-cover">`;
             } else {
-                headerLogo.innerHTML = `<i class="fa-solid fa-briefcase text-lg"></i>`;
+                headerLogo.innerHTML = `<i class="fa-solid fa-clipboard-check text-lg"></i>`;
                 sidebarLogo.innerHTML = `<i class="fa-solid fa-building-shield"></i>`;
                 settingsLogoPrev.innerHTML = `<i class="fa-solid fa-building text-slate-500 text-xl"></i>`;
             }
@@ -599,8 +1179,8 @@
                 splashLogoBox.innerHTML = `<img src="${settings.splashLogo}" class="w-full h-full object-cover">`;
                 settingsSplashLogoPrev.innerHTML = `<img src="${settings.splashLogo}" class="w-full h-full object-cover">`;
             } else {
-                splashLogoBox.innerHTML = `<i class="fa-solid fa-clipboard-user text-white"></i>`;
-                settingsSplashLogoPrev.innerHTML = `<i class="fa-solid fa-clipboard-user text-white text-xl"></i>`;
+                splashLogoBox.innerHTML = `<i class="fa-solid fa-clipboard-check text-white"></i>`;
+                settingsSplashLogoPrev.innerHTML = `<i class="fa-solid fa-clipboard-check text-white text-xl"></i>`;
             }
         }
 
@@ -623,7 +1203,7 @@
         }
 
         function saveSettings() {
-            settings.name = document.getElementById('setting-company-name').value || 'PT. Solusi Mandiri Utama';
+            settings.name = document.getElementById('setting-company-name').value || 'M&R System';
             settings.address = document.getElementById('setting-company-address').value || '';
             localStorage.setItem('company_settings', JSON.stringify(settings));
             applySettingsToUI();
@@ -634,6 +1214,291 @@
             const today = new Date().toISOString().split('T')[0];
             const dateInput = document.getElementById('report-date');
             if (dateInput && !dateInput.value) dateInput.value = today;
+        }
+
+        function setDefaultWeeklyDates() {
+            const curr = new Date();
+            const first = curr.getDate() - curr.getDay() + 1;
+            const last = first + 6;
+            const startDate = new Date(curr.setDate(first)).toISOString().split('T')[0];
+            const endDate = new Date(curr.setDate(last)).toISOString().split('T')[0];
+
+            const ws = document.getElementById('weekly-start-date');
+            const we = document.getElementById('weekly-end-date');
+            if (ws) ws.value = startDate;
+            if (we) we.value = endDate;
+        }
+
+        function setReportMode(mode) {
+            currentReportMode = mode;
+            const btnWeekly = document.getElementById('modeWeekly');
+            const btnDaily = document.getElementById('modeDaily');
+            const labelWeek = document.getElementById('labelPeriodNumber');
+            const printTitle = document.getElementById('printReportTitle');
+            const metaWeekInput = document.getElementById('metaWeekNumber');
+
+            if(mode === 'weekly') {
+                btnWeekly.className = "px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white shadow-sm transition cursor-pointer";
+                btnDaily.className = "px-4 py-2 text-xs font-bold rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer";
+                labelWeek.innerText = "Minggu Ke-";
+                if(printTitle) printTitle.innerText = "LAPORAN PEMELIHARAAN MINGGUAN";
+                if(metaWeekInput.value.includes("Sif") || metaWeekInput.value === "") metaWeekInput.value = "Minggu ke-1";
+            } else {
+                btnDaily.className = "px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 text-white shadow-sm transition cursor-pointer";
+                btnWeekly.className = "px-4 py-2 text-xs font-bold rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer";
+                labelWeek.innerText = "Sif / Shift";
+                if(printTitle) printTitle.innerText = "LAPORAN PEMELIHARAAN HARIAN";
+                if(metaWeekInput.value.includes("Minggu") || metaWeekInput.value === "") metaWeekInput.value = "Sif Pagi / Shift 1";
+            }
+            renderChecklist();
+        }
+
+        function getCurrentChecklistData() {
+            return currentReportMode === 'weekly' ? reportDataWeekly : reportDataDaily;
+        }
+
+        function saveCurrentChecklistData() {
+            if (currentReportMode === 'weekly') {
+                localStorage.setItem('mr_report_data_weekly', JSON.stringify(reportDataWeekly));
+            } else {
+                localStorage.setItem('mr_report_data_daily', JSON.stringify(reportDataDaily));
+            }
+        }
+
+        function renderCategoryTabs() {
+            const container = document.getElementById('categoryFilterTabs');
+            if (!container) return;
+            const categories = ['All', ...new Set(masterItems.map(i => i.cat))];
+            let html = `<button onclick="filterCategory('All')" class="px-2.5 py-1 text-xs font-bold rounded-xl ${selectedCategoryFilter === 'All' ? 'bg-indigo-600 text-white shadow' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'} transition cursor-pointer">Semua</button>`;
+            categories.filter(c => c !== 'All').forEach(cat => {
+                html += `<button onclick="filterCategory('${cat}')" class="px-2.5 py-1 text-xs font-bold rounded-xl ${selectedCategoryFilter === cat ? 'bg-indigo-600 text-white shadow' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'} transition cursor-pointer">${cat}</button>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function filterCategory(cat) {
+            selectedCategoryFilter = cat;
+            renderCategoryTabs();
+            renderChecklist();
+        }
+
+        function checkAllOK() {
+            let activeData = getCurrentChecklistData();
+            masterItems.forEach((item, index) => {
+                if(!activeData[index]) activeData[index] = {};
+                activeData[index].status = 'OK';
+            });
+            saveCurrentChecklistData();
+            renderChecklist();
+        }
+
+        function renderChecklist() {
+            const tbody = document.getElementById('checklistTableBody');
+            if (!tbody) return;
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilterSelect').value;
+            let activeData = getCurrentChecklistData();
+            let html = '';
+            let total = 0, okCount = 0, nokCount = 0;
+
+            masterItems.forEach((item, index) => {
+                if(selectedCategoryFilter !== 'All' && item.cat !== selectedCategoryFilter) return;
+                const itemState = activeData[index] || { status: 'OK', note: '', photo: '' };
+                if(statusFilter !== 'All' && itemState.status !== statusFilter) return;
+                if(searchVal && !item.name.toLowerCase().includes(searchVal) && !item.sub.toLowerCase().includes(searchVal) && !item.passing.toLowerCase().includes(searchVal)) return;
+
+                total++;
+                if(itemState.status === 'OK') okCount++;
+                if(itemState.status === 'NOK') nokCount++;
+
+                let priorityClass = "bg-amber-50 text-amber-700 border-amber-200";
+                if(item.priority && item.priority.includes("Tinggi Sekali")) priorityClass = "bg-rose-50 text-rose-700 border-rose-200";
+
+                html += `
+                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition border-b border-slate-100 dark:border-slate-800">
+                        <td class="py-3.5 px-4 align-top">
+                            <span class="inline-block px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold rounded uppercase mb-1">${item.cat}</span>
+                            <div class="font-semibold text-slate-800 dark:text-slate-200 text-xs">${item.sub}</div>
+                        </td>
+                        <td class="py-3.5 px-4 align-top">
+                            <div class="font-bold text-slate-900 dark:text-white text-xs">${item.name}</div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">${item.passing}</p>
+                            <span class="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded border ${priorityClass}">${item.priority || '-'}</span>
+                        </td>
+                        <td class="py-3.5 px-4 align-top text-center">
+                            <span class="text-xs font-semibold text-slate-600 dark:text-slate-400">${item.duration || 'Weekly'}</span>
+                        </td>
+                        <td class="py-3.5 px-4 align-top text-center">
+                            <div class="inline-flex rounded-xl p-0.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 no-print">
+                                <button onclick="setChecklistStatus(${index}, 'OK')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${itemState.status === 'OK' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300'}">OK</button>
+                                <button onclick="setChecklistStatus(${index}, 'NOK')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${itemState.status === 'NOK' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300'}">NOK</button>
+                                <button onclick="setChecklistStatus(${index}, 'NA')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${itemState.status === 'NA' ? 'bg-slate-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300'}">N/A</button>
+                            </div>
+                            <span class="hidden print-only font-bold text-xs">${itemState.status}</span>
+                        </td>
+                        <td class="py-3.5 px-4 align-top space-y-2">
+                            <input type="text" value="${itemState.note || ''}" oninput="setChecklistNote(${index}, this.value)" placeholder="Catatan perbaikan..." class="w-full text-xs border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 focus:ring-1 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-medium">
+                            <div class="flex items-center space-x-2 no-print">
+                                <label class="cursor-pointer px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 rounded-lg text-[10px] font-bold transition inline-flex items-center">
+                                    <i class="fa-solid fa-camera mr-1 text-indigo-600"></i> Foto
+                                    <input type="file" accept="image/*" onchange="setChecklistPhoto(${index}, event)" class="hidden">
+                                </label>
+                                ${itemState.photo ? `<div class="flex items-center space-x-1.5"><img src="${itemState.photo}" class="w-6 h-6 object-cover rounded cursor-pointer border border-slate-200" onclick="openImageModal('${itemState.photo}')"><button onclick="removeChecklistPhoto(${index})" class="text-[10px] text-rose-500 hover:underline font-semibold cursor-pointer">Hapus</button></div>` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html || `<tr><td colspan="5" class="text-center py-8 text-slate-400 text-xs">Tidak ada item checklist yang cocok.</td></tr>`;
+
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('statOk').innerText = okCount;
+            document.getElementById('statNok').innerText = nokCount;
+            const pct = total > 0 ? Math.round((okCount / total) * 100) : 0;
+            document.getElementById('statProgressBar').style.width = pct + '%';
+            document.getElementById('statProgressText').innerText = pct + '%';
+
+            const pm = document.getElementById('printMonth');
+            const pw = document.getElementById('printWeek');
+            const pd = document.getElementById('printDateVal');
+            if(pm) pm.innerText = document.getElementById('metaMonth').value;
+            if(pw) pw.innerText = document.getElementById('metaWeekNumber').value;
+            if(pd) pd.innerText = document.getElementById('metaDate').value;
+            if(document.getElementById('printCompanyName')) document.getElementById('printCompanyName').innerText = settings.name;
+            if(document.getElementById('printCompanyAddress')) document.getElementById('printCompanyAddress').innerText = settings.address;
+        }
+
+        function setChecklistStatus(index, status) {
+            let activeData = getCurrentChecklistData();
+            if(!activeData[index]) activeData[index] = {};
+            activeData[index].status = status;
+            saveCurrentChecklistData();
+            renderChecklist();
+        }
+
+        function setChecklistNote(index, note) {
+            let activeData = getCurrentChecklistData();
+            if(!activeData[index]) activeData[index] = {};
+            activeData[index].note = note;
+            saveCurrentChecklistData();
+        }
+
+        function setChecklistPhoto(index, event) {
+            const file = event.target.files[0];
+            if(file) {
+                compressImage(file, 800, 800, 0.9, (base64) => {
+                    let activeData = getCurrentChecklistData();
+                    if(!activeData[index]) activeData[index] = {};
+                    activeData[index].photo = base64;
+                    saveCurrentChecklistData();
+                    renderChecklist();
+                });
+            }
+        }
+
+        function removeChecklistPhoto(index) {
+            let activeData = getCurrentChecklistData();
+            if(activeData[index]) {
+                activeData[index].photo = '';
+                saveCurrentChecklistData();
+                renderChecklist();
+            }
+        }
+
+        function renderMasterTable() {
+            const tbody = document.getElementById('masterTableBody');
+            if (!tbody) return;
+            let html = '';
+            masterItems.forEach((item, index) => {
+                html += `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border-b border-slate-100 dark:border-slate-800">
+                        <td class="py-3 px-4 font-bold text-indigo-700 dark:text-indigo-400 text-xs">${item.cat}</td>
+                        <td class="py-3 px-4 text-slate-700 dark:text-slate-300 text-xs">${item.sub}</td>
+                        <td class="py-3 px-4 font-bold text-slate-900 dark:text-white text-xs">${item.name}</td>
+                        <td class="py-3 px-4 text-slate-500 dark:text-slate-400 text-xs">${item.passing}</td>
+                        <td class="py-3 px-4 text-xs"><span class="px-2 py-0.5 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 rounded font-semibold">${item.priority}</span></td>
+                        <td class="py-3 px-4 text-center space-x-1.5">
+                            <button onclick="editMasterItem(${index})" class="px-2.5 py-1 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-bold hover:bg-amber-100 cursor-pointer"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteMasterItem(${index})" class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 rounded-lg text-xs font-bold hover:bg-rose-100 cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function openItemModal(index = -1) {
+            document.getElementById('itemModal').classList.remove('hidden');
+            document.getElementById('editItemIndex').value = index;
+            if(index >= 0) {
+                const item = masterItems[index];
+                document.getElementById('modalTitle').innerText = "Edit Item Checklist";
+                document.getElementById('formCategory').value = item.cat;
+                document.getElementById('formSubCategory').value = item.sub;
+                document.getElementById('formItemName').value = item.name;
+                document.getElementById('formPassing').value = item.passing;
+                document.getElementById('formPriority').value = item.priority;
+                document.getElementById('formDuration').value = item.duration;
+            } else {
+                document.getElementById('modalTitle').innerText = "Tambah Item Checklist Baru";
+                document.getElementById('formCategory').value = "";
+                document.getElementById('formSubCategory').value = "";
+                document.getElementById('formItemName').value = "";
+                document.getElementById('formPassing').value = "";
+                document.getElementById('formDuration').value = "Weekly";
+            }
+        }
+
+        function closeItemModal() {
+            document.getElementById('itemModal').classList.add('hidden');
+        }
+
+        function saveMasterItem() {
+            const index = parseInt(document.getElementById('editItemIndex').value);
+            const newItem = {
+                cat: document.getElementById('formCategory').value || 'General',
+                sub: document.getElementById('formSubCategory').value || 'Unit',
+                name: document.getElementById('formItemName').value || 'Tanpa Nama',
+                passing: document.getElementById('formPassing').value || '-',
+                priority: document.getElementById('formPriority').value,
+                duration: document.getElementById('formDuration').value || 'Weekly'
+            };
+
+            if(index >= 0) masterItems[index] = newItem;
+            else masterItems.push(newItem);
+
+            localStorage.setItem('mr_master_items', JSON.stringify(masterItems));
+            closeItemModal();
+            renderCategoryTabs();
+            renderChecklist();
+            renderMasterTable();
+        }
+
+        function editMasterItem(index) { openItemModal(index); }
+
+        function deleteMasterItem(index) {
+            showCustomModal("Konfirmasi Hapus", "Hapus item master checklist ini?", true, "fa-solid fa-triangle-exclamation", (confirmed) => {
+                if (confirmed) {
+                    masterItems.splice(index, 1);
+                    localStorage.setItem('mr_master_items', JSON.stringify(masterItems));
+                    renderCategoryTabs();
+                    renderChecklist();
+                    renderMasterTable();
+                }
+            });
+        }
+
+        function resetDefaultMasterData() {
+            showCustomModal("Reset Master", "Reset item master kembali ke default?", true, "fa-solid fa-triangle-exclamation", (confirmed) => {
+                if (confirmed) {
+                    masterItems = [...defaultMasterItems];
+                    localStorage.setItem('mr_master_items', JSON.stringify(masterItems));
+                    renderCategoryTabs();
+                    renderChecklist();
+                    renderMasterTable();
+                }
+            });
         }
 
         function addActivityItem(data = null) {
@@ -653,6 +1518,7 @@
 
         function renderFormActivities() {
             const container = document.getElementById('activities-container');
+            if (!container) return;
             container.innerHTML = '';
             formActivities.forEach((act, index) => {
                 const card = document.createElement('div');
@@ -690,7 +1556,7 @@
             const files = event.target.files;
             if (!files) return;
             for (let file of files) {
-                compressImage(file, 1600, 1600, 0.95, (compressedBase64) => {
+                compressImage(file, 1200, 1200, 0.9, (compressedBase64) => {
                     formActivities[actIndex].photos.push(compressedBase64);
                     renderFormActivities();
                 });
@@ -769,14 +1635,20 @@
             }
 
             const id = document.getElementById('report-id').value;
+            const techSigData = sigPadTech && !sigPadTech.isEmpty() ? sigPadTech.toDataURL() : (editingId ? (reports.find(r => r.id === editingId)?.sigTech || '') : '');
+            const opsSigData = sigPadOps && !sigPadOps.isEmpty() ? sigPadOps.toDataURL() : (editingId ? (reports.find(r => r.id === editingId)?.sigOps || '') : '');
+
             const newReport = {
                 id: id ? id : 'REP-' + Date.now(),
                 date: document.getElementById('report-date').value,
                 author: document.getElementById('report-author').value,
+                operational: document.getElementById('report-operational').value,
                 location: document.getElementById('report-location').value,
                 timeStart: document.getElementById('report-time-start').value,
                 timeEnd: document.getElementById('report-time-end').value,
                 activities: JSON.parse(JSON.stringify(formActivities)),
+                sigTech: techSigData,
+                sigOps: opsSigData,
                 createdAt: id ? (reports.find(r => r.id === id)?.createdAt || new Date().toISOString()) : new Date().toISOString()
             };
 
@@ -784,7 +1656,7 @@
             await loadReportsFromDB();
             resetForm();
             switchTab('home');
-            showCustomModal("Berhasil", "Laporan kerja berhasil disimpan ke database lokal ponsel!", false, "fa-solid fa-circle-check");
+            showCustomModal("Berhasil", "Laporan kerja harian berhasil disimpan!", false, "fa-solid fa-circle-check");
         }
 
         function resetForm() {
@@ -793,6 +1665,8 @@
             setDefaultValues();
             formActivities = [];
             addActivityItem();
+            clearSignature('tech');
+            clearSignature('ops');
             editingId = null;
             document.getElementById('form-title').innerText = 'Form Laporan Kerja';
             document.getElementById('btn-submit-text').innerText = 'Simpan Laporan Kerja';
@@ -801,12 +1675,13 @@
         function renderReports() {
             const container = document.getElementById('reports-list-container');
             const emptyState = document.getElementById('empty-state');
+            if (!container) return;
             const searchQuery = document.getElementById('search-input').value.toLowerCase();
             const filterDate = document.getElementById('filter-date').value;
 
             container.innerHTML = '';
             let filtered = reports.filter(r => {
-                const matchSearch = r.author.toLowerCase().includes(searchQuery) || r.location.toLowerCase().includes(searchQuery) || r.activities.some(act => act.description.toLowerCase().includes(searchQuery));
+                const matchSearch = r.author.toLowerCase().includes(searchQuery) || (r.operational && r.operational.toLowerCase().includes(searchQuery)) || r.location.toLowerCase().includes(searchQuery) || r.activities.some(act => act.description.toLowerCase().includes(searchQuery));
                 const matchDate = filterDate ? r.date === filterDate : true;
                 return matchSearch && matchDate;
             });
@@ -825,15 +1700,15 @@
                 card.innerHTML = `
                     <div class="space-y-1.5 flex-1">
                         <div class="flex items-center space-x-2">
-                            <span class="bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 text-[10px] font-bold px-2.5 py-0.5 rounded-lg border border-indigo-200 dark:border-indigo-900/40">${formattedDate} (${rep.timeStart} - ${rep.timeEnd})</span>
+                            <span class="bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300 text-[10px] font-bold px-2.5 py-0.5 rounded-lg">${formattedDate} (${rep.timeStart} - ${rep.timeEnd})</span>
                         </div>
-                        <h4 class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white"><i class="fa-solid fa-user mr-1.5 text-indigo-600"></i>${rep.author} - <span class="font-semibold text-slate-700 dark:text-slate-400">${rep.location}</span></h4>
+                        <h4 class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white"><i class="fa-solid fa-user-gear mr-1.5 text-indigo-600"></i>${rep.author} <span class="text-slate-500 font-normal">| SPV: ${rep.operational || '-'}</span> - <span class="font-semibold text-slate-700 dark:text-slate-300">${rep.location}</span></h4>
                         <p class="text-xs text-slate-800 dark:text-slate-300 font-medium line-clamp-1">${rep.activities[0]?.description || ''}</p>
                     </div>
                     <div class="flex items-center space-x-1.5 self-end sm:self-center">
-                        <button onclick="viewDetail('${rep.id}')" class="w-9 h-9 bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-950 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-2xl flex items-center justify-center text-xs transition cursor-pointer shadow-xs border border-indigo-200 dark:border-indigo-900 font-bold" title="Detail"><i class="fa-solid fa-eye"></i></button>
-                        <button onclick="editReport('${rep.id}')" class="w-9 h-9 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-300 rounded-2xl flex items-center justify-center text-xs transition cursor-pointer shadow-xs border border-slate-300 dark:border-slate-700 font-bold" title="Edit"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="confirmDelete('${rep.id}')" class="w-9 h-9 bg-rose-100 hover:bg-rose-200 dark:bg-rose-950 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 rounded-2xl flex items-center justify-center text-xs transition cursor-pointer shadow-xs border border-rose-200 dark:border-rose-900 font-bold" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="viewDetail('${rep.id}')" class="w-9 h-9 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-2xl flex items-center justify-center text-xs transition cursor-pointer font-bold" title="Detail"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="editReport('${rep.id}')" class="w-9 h-9 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-2xl flex items-center justify-center text-xs transition cursor-pointer font-bold" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="confirmDelete('${rep.id}')" class="w-9 h-9 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-2xl flex items-center justify-center text-xs transition cursor-pointer font-bold" title="Hapus"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 `;
                 container.appendChild(card);
@@ -842,8 +1717,10 @@
 
         function updateStatistics() {
             const total = reports.length;
-            document.getElementById('stat-total').textContent = total;
-            document.getElementById('report-count').textContent = total + ' Laporan';
+            const statTotal = document.getElementById('stat-total');
+            const reportCount = document.getElementById('report-count');
+            if (statTotal) statTotal.textContent = total;
+            if (reportCount) reportCount.textContent = total + ' Laporan';
         }
 
         function viewDetail(id) {
@@ -855,16 +1732,38 @@
             document.getElementById('detail-company-address').innerText = settings.address;
             
             const printLogoBox = document.getElementById('print-logo-box');
-            if (settings.logo) {
-                printLogoBox.innerHTML = `<img src="${settings.logo}" class="w-full h-full object-cover">`;
-            } else {
-                printLogoBox.innerHTML = `<i class="fa-solid fa-building text-slate-700 text-lg"></i>`;
-            }
+            if (settings.logo) printLogoBox.innerHTML = `<img src="${settings.logo}" class="w-full h-full object-cover">`;
+            else printLogoBox.innerHTML = `<i class="fa-solid fa-building text-slate-700 text-lg"></i>`;
 
             document.getElementById('det-date').innerText = formatDateToID(rep.date);
             document.getElementById('det-author').innerText = rep.author;
+            document.getElementById('det-operational').innerText = rep.operational || '-';
+            document.getElementById('det-author-name').innerText = rep.author;
+            document.getElementById('det-ops-name').innerText = rep.operational || '-';
             document.getElementById('det-location').innerText = rep.location;
             document.getElementById('det-time-range').innerText = `${rep.timeStart} - ${rep.timeEnd} WIB`;
+
+            const sigTechImg = document.getElementById('det-sig-tech');
+            const sigTechEmpty = document.getElementById('det-sig-tech-empty');
+            if (rep.sigTech) {
+                sigTechImg.src = rep.sigTech;
+                sigTechImg.classList.remove('hidden');
+                sigTechEmpty.classList.add('hidden');
+            } else {
+                sigTechImg.classList.add('hidden');
+                sigTechEmpty.classList.remove('hidden');
+            }
+
+            const sigOpsImg = document.getElementById('det-sig-ops');
+            const sigOpsEmpty = document.getElementById('det-sig-ops-empty');
+            if (rep.sigOps) {
+                sigOpsImg.src = rep.sigOps;
+                sigOpsImg.classList.remove('hidden');
+                sigOpsEmpty.classList.add('hidden');
+            } else {
+                sigOpsImg.classList.add('hidden');
+                sigOpsEmpty.classList.remove('hidden');
+            }
 
             const container = document.getElementById('det-activities-container');
             container.innerHTML = '';
@@ -898,15 +1797,104 @@
             document.getElementById('report-id').value = rep.id;
             document.getElementById('report-date').value = rep.date;
             document.getElementById('report-author').value = rep.author;
+            document.getElementById('report-operational').value = rep.operational || '';
             document.getElementById('report-location').value = rep.location;
             document.getElementById('report-time-start').value = rep.timeStart || '08:00';
             document.getElementById('report-time-end').value = rep.timeEnd || '17:00';
             formActivities = JSON.parse(JSON.stringify(rep.activities || []));
             renderFormActivities();
             editingId = id;
+            clearSignature('tech');
+            clearSignature('ops');
             document.getElementById('form-title').innerText = 'Edit Laporan Kerja';
             document.getElementById('btn-submit-text').innerText = 'Perbarui Laporan Kerja';
             switchTab('create');
+        }
+
+        function generateWeeklyReport() {
+            const ws = document.getElementById('weekly-start-date');
+            const we = document.getElementById('weekly-end-date');
+            if(!ws || !we) return;
+            const startDate = ws.value;
+            const endDate = we.value;
+
+            document.getElementById('weekly-detail-company-name').innerText = settings.name;
+            document.getElementById('weekly-detail-company-address').innerText = settings.address;
+
+            const weeklyLogoBox = document.getElementById('weekly-print-logo-box');
+            if (settings.logo) weeklyLogoBox.innerHTML = `<img src="${settings.logo}" class="w-full h-full object-cover">`;
+            else weeklyLogoBox.innerHTML = `<i class="fa-solid fa-building text-slate-700 text-lg"></i>`;
+
+            document.getElementById('weekly-det-range').innerText = `${formatDateToID(startDate)} - ${formatDateToID(endDate)}`;
+            const filtered = reports.filter(r => r.date >= startDate && r.date <= endDate).sort((a, b) => new Date(a.date) - new Date(b.date));
+            document.getElementById('weekly-det-count').innerText = `${filtered.length} Laporan`;
+
+            // Handle Tanda Tangan Rekap Mingguan pada Print Area
+            const weeklyDetSigTech = document.getElementById('weekly-det-sig-tech');
+            const weeklyDetSigTechEmpty = document.getElementById('weekly-det-sig-tech-empty');
+            if (sigPadWeeklyTech && !sigPadWeeklyTech.isEmpty()) {
+                weeklyDetSigTech.src = sigPadWeeklyTech.toDataURL();
+                weeklyDetSigTech.classList.remove('hidden');
+                weeklyDetSigTechEmpty.classList.add('hidden');
+            } else {
+                weeklyDetSigTech.classList.add('hidden');
+                weeklyDetSigTechEmpty.classList.remove('hidden');
+            }
+
+            const weeklyDetSigOps = document.getElementById('weekly-det-sig-ops');
+            const weeklyDetSigOpsEmpty = document.getElementById('weekly-det-sig-ops-empty');
+            if (sigPadWeeklyOps && !sigPadWeeklyOps.isEmpty()) {
+                weeklyDetSigOps.src = sigPadWeeklyOps.toDataURL();
+                weeklyDetSigOps.classList.remove('hidden');
+                weeklyDetSigOpsEmpty.classList.add('hidden');
+            } else {
+                weeklyDetSigOps.classList.add('hidden');
+                weeklyDetSigOpsEmpty.classList.remove('hidden');
+            }
+
+            updateWeeklySignerNames();
+
+            const container = document.getElementById('weekly-reports-container');
+            container.innerHTML = '';
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="p-6 text-center text-slate-500 font-bold border border-slate-200 rounded-2xl bg-slate-50">Tidak ada laporan pada rentang tanggal minggu ini.</div>`;
+                return;
+            }
+
+            filtered.forEach((rep, index) => {
+                const box = document.createElement('div');
+                box.className = 'border border-slate-300 rounded-2xl p-4 bg-slate-50 space-y-2';
+                box.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-slate-300 pb-2">
+                        <span class="font-bold text-xs text-purple-800">Hari #${index + 1} - ${formatDateToID(rep.date)} (${rep.timeStart} - ${rep.timeEnd})</span>
+                        <span class="text-[10px] bg-slate-200 px-2.5 py-0.5 rounded-lg font-bold">${rep.location}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-[11px]">
+                        <div><strong>Teknisi:</strong> ${rep.author}</div>
+                        <div class="text-right"><strong>Operasional:</strong> ${rep.operational || '-'}</div>
+                    </div>
+                    <div class="space-y-1 mt-2">
+                        <strong class="text-[11px] text-slate-800">Kegiatan Terdaftar:</strong>
+                        <ul class="list-disc list-inside text-xs space-y-1 bg-white p-2.5 rounded-xl border border-slate-300">
+                            ${rep.activities.map(a => `<li>${a.description}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                container.appendChild(box);
+            });
+        }
+
+        function downloadWeeklyPDF() {
+            generateWeeklyReport();
+            const startDate = document.getElementById('weekly-start-date').value;
+            const endDate = document.getElementById('weekly-end-date').value;
+            const element = document.getElementById('weekly-print-area');
+            html2pdf().from(element).set({
+                margin: 10,
+                filename: `Laporan_Mingguan_${startDate}_sd_${endDate}.pdf`,
+                image: { type: 'jpeg', quality: 0.99 },
+                html2canvas: { scale: 3, useCORS: true, letterRendering: true, scrollY: 0 }
+            }).save();
         }
 
         function confirmDelete(id) {
@@ -935,10 +1923,6 @@
         function executeDownload() {
             const format = document.getElementById('download-format').value;
             closeModal('download-modal');
-            if (format === 'json') {
-                downloadJsonBackup();
-                return;
-            }
             if (format === 'txt') {
                 downloadReportTxt();
                 return;
@@ -954,10 +1938,8 @@
 
         function downloadReportTxt() {
             if (!currentReportData) return;
-            let content = `LAPORAN KERJA HARIAN\nPerusahaan: ${settings.name}\nTanggal: ${formatDateToID(currentReportData.date)}\nPelapor: ${currentReportData.author}\nLokasi: ${currentReportData.location}\n\nRINCIAN:\n`;
-            currentReportData.activities.forEach((a, i) => {
-                content += `${i+1}. ${a.description}\n`;
-            });
+            let content = `LAPORAN KERJA HARIAN\nPerusahaan: ${settings.name}\nTanggal: ${formatDateToID(currentReportData.date)}\nTeknisi: ${currentReportData.author}\nOperasional: ${currentReportData.operational || '-'}\nLokasi: ${currentReportData.location}\n\nRINCIAN:\n`;
+            currentReportData.activities.forEach((a, i) => { content += `${i+1}. ${a.description}\n`; });
             const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -982,25 +1964,31 @@
         function exportPDF() {
             if (!currentReportData) return;
             const element = document.getElementById('print-area');
-            const filename = `Laporan_${currentReportData.author}_${currentReportData.date}.pdf`;
-            
             html2pdf().from(element).set({ 
                 margin: 10, 
-                filename: filename, 
+                filename: `Laporan_${currentReportData.author}_${currentReportData.date}.pdf`, 
                 image: { type: 'jpeg', quality: 0.99 }, 
                 html2canvas: { scale: 3, useCORS: true, letterRendering: true, scrollY: 0 } 
             }).save();
         }
 
-        function downloadJsonBackup() {
-            const backupPayload = { version: "4.5.0", exportDate: new Date().toISOString(), settings, reports };
-            const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Backup_Laporan_Ponsel_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
+        function exportJSON() {
+            const exportObj = { 
+                version: "5.1.0", 
+                exportDate: new Date().toISOString(), 
+                settings, 
+                masterItems, 
+                reports,
+                reportDataWeekly,
+                reportDataDaily
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `Unified_Backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
         }
 
         function restoreJsonBackup(event) {
@@ -1010,19 +1998,34 @@
             reader.onload = async function(e) {
                 try {
                     const parsed = JSON.parse(e.target.result);
+                    if (parsed.settings) {
+                        settings = parsed.settings;
+                        localStorage.setItem('company_settings', JSON.stringify(settings));
+                        applySettingsToUI();
+                    }
+                    if (parsed.masterItems) {
+                        masterItems = parsed.masterItems;
+                        localStorage.setItem('mr_master_items', JSON.stringify(masterItems));
+                        renderCategoryTabs();
+                        renderChecklist();
+                        renderMasterTable();
+                    }
+                    if (parsed.reportDataWeekly) {
+                        reportDataWeekly = parsed.reportDataWeekly;
+                        localStorage.setItem('mr_report_data_weekly', JSON.stringify(reportDataWeekly));
+                    }
+                    if (parsed.reportDataDaily) {
+                        reportDataDaily = parsed.reportDataDaily;
+                        localStorage.setItem('mr_report_data_daily', JSON.stringify(reportDataDaily));
+                    }
                     if (parsed.reports) {
                         reports = parsed.reports;
-                        if (parsed.settings) {
-                            settings = parsed.settings;
-                            localStorage.setItem('company_settings', JSON.stringify(settings));
-                            applySettingsToUI();
-                        }
                         const tx = db.transaction(['reports'], 'readwrite');
                         const store = tx.objectStore('reports');
                         reports.forEach(r => store.put(r));
                         tx.oncomplete = async () => {
                             await loadReportsFromDB();
-                            showCustomModal("Berhasil", "Data berhasil dipulihkan dari memori ponsel!", false, "fa-solid fa-circle-check");
+                            showCustomModal("Berhasil", "Data berhasil dipulihkan secara menyeluruh!", false, "fa-solid fa-circle-check");
                         }
                     }
                 } catch(err) {
@@ -1030,6 +2033,15 @@
                 }
             };
             reader.readAsText(file);
+        }
+
+        function openImageModal(src) {
+            document.getElementById('modalImagePreview').src = src;
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
         }
 
         function showCustomModal(title, message, isConfirm = false, iconClass = "fa-solid fa-circle-info", callback = null) {

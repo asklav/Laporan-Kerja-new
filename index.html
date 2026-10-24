@@ -176,12 +176,12 @@
                 
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Supervisor / Pimpinan</label>
-                    <input type="text" id="metaSupervisor" onchange="syncMeta()" placeholder="Nama Supervisor..." value="Budi - SPV M&R" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 font-medium">
+                    <input type="text" id="metaSupervisor" oninput="syncMeta()" onchange="syncMeta()" placeholder="Nama Supervisor..." value="Budi - SPV M&R" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 font-medium">
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Teknisi / Pelaksana</label>
-                    <input type="text" id="metaInspector" onchange="syncMeta()" placeholder="Nama Teknisi..." value="Ahmad - Maintenance" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
+                    <input type="text" id="metaInspector" oninput="syncMeta()" onchange="syncMeta()" placeholder="Nama Teknisi..." value="Ahmad - Maintenance" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2">
                 </div>
 
                 <div class="md:col-span-2">
@@ -575,6 +575,7 @@
             renderTabs();
             renderChecklist();
             initSignatures();
+            syncMeta();
         }
 
         function runSplashScreen() {
@@ -664,11 +665,11 @@
 
             document.getElementById('metaSupervisor').value = appConfig.defaultSupervisor;
             document.getElementById('metaInspector').value = appConfig.defaultInspector;
-            document.getElementById('sigSpvLabel').innerText = appConfig.defaultSupervisor;
-            document.getElementById('sigOpsLabel').innerText = appConfig.defaultInspector;
 
             document.getElementById('cfgCompanyName').value = appConfig.companyName;
             document.getElementById('cfgCompanyAddress').value = appConfig.companyAddress;
+            
+            syncMeta();
         }
 
         function uploadImageFile(event, type) {
@@ -730,7 +731,29 @@
             }
         }
 
-        function syncMeta() { renderChecklist(); }
+        function syncMeta() { 
+            const spvVal = document.getElementById('metaSupervisor').value || '-';
+            const insVal = document.getElementById('metaInspector').value || '-';
+            const monthVal = document.getElementById('metaMonth').value;
+            const weekVal = document.getElementById('metaWeek').value;
+
+            // Perbarui label tanda tangan di halaman utama
+            const sigSpvElem = document.getElementById('sigSpvLabel');
+            const sigOpsElem = document.getElementById('sigOpsLabel');
+            if (sigSpvElem) sigSpvElem.innerText = spvVal;
+            if (sigOpsElem) sigOpsElem.innerText = insVal;
+
+            // Perbarui teks header cetak langsung
+            const printPeriod = document.getElementById('printMetaPeriod');
+            const printSpv = document.getElementById('printMetaSupervisor');
+            const printIns = document.getElementById('printMetaInspector');
+            const printDate = document.getElementById('printMetaDate');
+
+            if (printPeriod) printPeriod.innerText = `${monthVal} (${weekVal})`;
+            if (printSpv) printSpv.innerText = spvVal;
+            if (printIns) printIns.innerText = insVal;
+            if (printDate) printDate.innerText = new Date().toLocaleDateString('id-ID');
+        }
 
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
@@ -790,11 +813,7 @@
                 grouped[item.cat].push(item);
             });
 
-            document.getElementById('printMetaPeriod').innerText = `${document.getElementById('metaMonth').value} (${document.getElementById('metaWeek').value})`;
-            document.getElementById('printMetaSupervisor').innerText = document.getElementById('metaSupervisor').value;
-            document.getElementById('printMetaInspector').innerText = document.getElementById('metaInspector').value;
-            document.getElementById('printMetaDate').innerText = new Date().toLocaleDateString('id-ID');
-
+            syncMeta();
             updateProgress();
 
             if (Object.keys(grouped).length === 0) {
@@ -898,8 +917,8 @@
         // Modal Preview Cetak yang Rapi dan Terstruktur
         function openPreviewModal() {
             const previewArea = document.getElementById('previewContentArea');
-            const supName = document.getElementById('metaSupervisor').value;
-            const insName = document.getElementById('metaInspector').value;
+            const supName = document.getElementById('metaSupervisor').value || '-';
+            const insName = document.getElementById('metaInspector').value || '-';
             const monthVal = document.getElementById('metaMonth').value;
             const weekVal = document.getElementById('metaWeek').value;
 
